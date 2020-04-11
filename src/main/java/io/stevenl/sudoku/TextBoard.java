@@ -19,7 +19,7 @@ public class TextBoard extends Board {
                 int value = Integer.parseInt(String.valueOf(c));
 
                 if (0 < value && value <= SIZE) {
-                    board.getCell(index).setValue(value);
+                    board.setCellValue(index, value);
                 }
             }
             index++;

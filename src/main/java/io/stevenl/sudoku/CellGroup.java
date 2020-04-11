@@ -29,10 +29,6 @@ public class CellGroup {
         return cells[index];
     }
 
-    //public Cell[] getCells() {
-    //    return cells;
-    //}
-
     public void removeWantedValue(int value) {
         wantedValues.remove(value);
 

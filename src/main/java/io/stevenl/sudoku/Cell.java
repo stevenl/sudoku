@@ -35,6 +35,11 @@ public class Cell {
 
     public void setValue(int value) {
         this.value = value;
+        possibleValues.clear();
+
+        for (CellGroup observer : observers) {
+            observer.removeWantedValue(value);
+        }
     }
 
     public int getValue() {

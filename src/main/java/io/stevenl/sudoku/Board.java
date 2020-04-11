@@ -81,4 +81,9 @@ public class Board {
 
         return rowInSq * SQUARE_SIZE + colInSq;
     }
+
+    public void setCellValue(int index, int value) {
+        Cell cell = getCell(index);
+        cell.setValue(value);
+    }
 }
