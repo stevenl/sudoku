@@ -33,10 +33,45 @@ public class Board {
 
         rows[row].addCell(col, cell);
         columns[col].addCell(row, cell);
-        //squares[]
+
+        int idxInSq = getCellIndexInSquare(index);
+        getSquare(index).addCell(idxInSq, cell);
     }
 
     public Cell getCell(int index) {
         return cells[index];
+    }
+
+    public Cell getCell(int row, int col) {
+        int index = row * SIZE + col;
+        return cells[index];
+    }
+
+    private int getSquareIndex(int index) {
+        int row = index / SIZE;
+        int col = index % SIZE;
+
+        int sqRow = row / SQUARE_SIZE;
+        int sqCol = col / SQUARE_SIZE;
+
+        return sqRow * SQUARE_SIZE + sqCol;
+    }
+
+    public CellGroup getSquare(int index) {
+        int sqIndex = getSquareIndex(index);
+        return squares[sqIndex];
+    }
+
+    private int getCellIndexInSquare(int index) {
+        int row = index / SIZE;
+        int col = index % SIZE;
+
+        int sqRow = row / SQUARE_SIZE;
+        int sqCol = col / SQUARE_SIZE;
+
+        int rowInSq = row - sqRow * SQUARE_SIZE;
+        int colInSq = col - sqCol * SQUARE_SIZE;
+
+        return rowInSq * SQUARE_SIZE + colInSq;
     }
 }
