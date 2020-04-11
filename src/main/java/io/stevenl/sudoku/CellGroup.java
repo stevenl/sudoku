@@ -32,4 +32,16 @@ public class CellGroup {
     //public Cell[] getCells() {
     //    return cells;
     //}
+
+    public void removeWantedValue(int value) {
+        wantedValues.remove(value);
+
+        // Update the cells in this group
+        for (Cell c : cells) {
+            if (c.getValue() > 0) {
+                continue;
+            }
+            c.removePossibleValue(value);
+        }
+    }
 }
