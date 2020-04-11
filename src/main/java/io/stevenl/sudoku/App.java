@@ -1,8 +1,8 @@
 package io.stevenl.sudoku;
 
 public class App {
-    public static void main(String[] args) {
-        Board b = Board.fromString(
+    public static void main(String[] args) throws Exception {
+        TextBoard b = TextBoard.fromString(
                   "  7   9 8"
                 + " 3 17   4"
                 + "     6   "
