@@ -20,22 +20,29 @@ public class Board {
             columns[i] = new CellGroup(SIZE);
             squares[i] = new CellGroup(SIZE);
         }
+
+        for (int i = 0; i < SIZE * SIZE; i++) {
+            addCell(i);
+        }
     }
 
-    public void addCell(int row, int col, int value) throws Exception {
-        int index = row * SIZE + col;
-        if (cells[index] != null) {
-            throw new Exception(String.format("Cell already exists at (%d, %d)", row, col));
-        }
+    private void addCell(int index) {
+        int rowIdx = index / SIZE;
+        int colIdx = index % SIZE;
+        int idxInSq = getCellIndexInSquare(index);
 
-        Cell cell = new Cell(value);
+        CellGroup row = rows[rowIdx];
+        CellGroup col = columns[colIdx];
+        CellGroup square = getSquare(index);
+
+        Cell cell = new Cell();
         cells[index] = cell;
 
-        rows[row].addCell(col, cell);
-        columns[col].addCell(row, cell);
+        row.addCell(colIdx, cell);
+        col.addCell(rowIdx, cell);
+        square.addCell(idxInSq, cell);
 
-        int idxInSq = getCellIndexInSquare(index);
-        getSquare(index).addCell(idxInSq, cell);
+        cell.addObservers(row, col, square);
     }
 
     public Cell getCell(int index) {

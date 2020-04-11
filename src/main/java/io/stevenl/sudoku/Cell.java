@@ -1,29 +1,24 @@
 package io.stevenl.sudoku;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Cell {
-    private static final int[] VALUES = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    private static final Set<Integer> ALL_POSSIBLE_VALUES =
+            new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
-    private Set<Integer> possibleValues = new HashSet<>();
+    private Set<CellGroup> observers = new HashSet<>();
+    private Set<Integer> possibleValues = new HashSet<>(ALL_POSSIBLE_VALUES);
     private int value;
 
-    public Cell(int value) {
-        this.value = value;
-
-        for (int v : VALUES) {
-            possibleValues.add(v);
-        }
+    public Cell() {
+        super();
     }
 
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
+    public void addObservers(CellGroup... observers) {
+        this.observers.addAll(Arrays.asList(observers));
     }
 
     public void removePossibleValue(int value) {
@@ -36,5 +31,13 @@ public class Cell {
 
     public int getNrPossibleValues() {
         return possibleValues.size();
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 }

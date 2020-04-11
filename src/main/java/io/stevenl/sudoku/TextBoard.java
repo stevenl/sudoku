@@ -2,20 +2,27 @@ package io.stevenl.sudoku;
 
 public class TextBoard extends Board {
 
-    public static TextBoard fromString(String input) throws Exception {
+    public static TextBoard fromString(String input) {
         TextBoard board = new TextBoard();
 
+        int index = 0;
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-            if (c == ' ') {
+
+            // Linebreaks do not increment the index
+            if (c == '\n') {
                 continue;
             }
 
-            int row = i / SIZE;
-            int col = i % SIZE;
-            int cellValue = Integer.parseInt(String.valueOf(c));
+            // Ignore the character if it is not a number between 1 and 9
+            if (Character.isDigit(c)) {
+                int value = Integer.parseInt(String.valueOf(c));
 
-            board.addCell(row, col, cellValue);
+                if (0 < value && value <= SIZE) {
+                    board.getCell(index).setValue(value);
+                }
+            }
+            index++;
         }
 
         return board;
@@ -32,12 +39,12 @@ public class TextBoard extends Board {
             sb.append("|");
             for (int j = 0; j < SIZE; j++) {
                 int index = i * SIZE + j;
-                Cell cell = getCell(index);
+                int value = getCell(index).getValue();
 
-                String value = cell != null
-                        ? String.valueOf(cell.getValue())
+                String valStr = value > 0
+                        ? String.valueOf(value)
                         : " ";
-                sb.append(String.format(" %s", value));
+                sb.append(String.format(" %s", valStr));
 
                 // Square separator (vertical)
                 if (j % SQUARE_SIZE == 2 && j < SIZE - 1) {
