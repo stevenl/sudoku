@@ -11,8 +11,8 @@ public class CellGroup {
         cells = new Cell[size];
 
         wantedValues = new HashSet<>(size);
-        for (int i = 1; i <= size; i++) {
-            wantedValues.add(i);
+        for (int v = 1; v <= size; v++) {
+            wantedValues.add(v);
         }
     }
 
@@ -25,7 +25,11 @@ public class CellGroup {
         }
     }
 
-    public Cell[] getCells() {
-        return cells;
+    public Cell getCell(int index) {
+        return cells[index];
     }
+
+    //public Cell[] getCells() {
+    //    return cells;
+    //}
 }
