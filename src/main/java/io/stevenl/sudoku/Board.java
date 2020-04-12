@@ -1,5 +1,9 @@
 package io.stevenl.sudoku;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 public class Board {
     public static final int SIZE = 9;
     public static final int SQUARE_SIZE = 3;
@@ -9,11 +13,14 @@ public class Board {
     private CellGroup[] columns;
     private CellGroup[] squares;
 
+    private Set<Integer> unsolved;
+
     public Board() {
         cells = new Cell[SIZE * SIZE];
         rows = new CellGroup[SIZE];
         columns = new CellGroup[SIZE];
         squares = new CellGroup[SIZE];
+        unsolved = new HashSet<>(SIZE * SIZE);
 
         for (int i = 0; i < SIZE; i++) {
             rows[i] = new CellGroup(SIZE);
@@ -23,6 +30,7 @@ public class Board {
 
         for (int i = 0; i < SIZE * SIZE; i++) {
             addCell(i);
+            unsolved.add(i);
         }
     }
 
@@ -46,11 +54,6 @@ public class Board {
     }
 
     public Cell getCell(int index) {
-        return cells[index];
-    }
-
-    public Cell getCell(int row, int col) {
-        int index = row * SIZE + col;
         return cells[index];
     }
 
@@ -85,5 +88,29 @@ public class Board {
     public void setCellValue(int index, int value) {
         Cell cell = getCell(index);
         cell.setValue(value);
+        unsolved.remove(index);
+    }
+
+    public void solve() {
+        while (true) {
+            boolean progress = false;
+            Iterator<Integer> iter = unsolved.iterator();
+            while (iter.hasNext()) {
+                int index = iter.next();
+                Cell c = getCell(index);
+
+                if (c.getNrPossibleValues() == 1) {
+                    int value = (int) c.getPossibleValues().toArray()[0];
+                    c.setValue(value);
+                    iter.remove();
+                    progress = true;
+                }
+            }
+
+            if (!progress) {
+                System.out.println("FAILED");
+                break;
+            }
+        }
     }
 }

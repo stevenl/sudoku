@@ -14,5 +14,9 @@ public class App {
                 + "4 5   1  "
         );
         System.out.println(b);
+
+        b.solve();
+        System.out.println(b);
+        b.printPossibleValues();
     }
 }

@@ -64,6 +64,12 @@ public class TextBoard extends Board {
 
         return sb.toString();
     }
+    public void printPossibleValues() {
+        for (int i = 0; i < SIZE * SIZE; i++) {
+            Cell c = getCell(i);
+            System.out.println(String.format("%d: %s", i, c.getPossibleValues()));
+        }
+    }
 
     private void appendHorizontalBorder(StringBuilder sb) {
         sb.append(" ");
