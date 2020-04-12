@@ -82,9 +82,49 @@ public class Solver {
             }
 
             if (!progress) {
+                for (int i = 0; i < Board.SIZE; i++) {
+                    progress = progress || solveNextByEliminationWithinGroup(board.getCellRow(i));
+                    progress = progress || solveNextByEliminationWithinGroup(board.getCellColumn(i));
+                    progress = progress || solveNextByEliminationWithinGroup(board.getCellSquare(i));
+                }
+            }
+
+            if (!progress) {
                 throw new Exception("Couldn't solve it");
             }
         }
+    }
+
+    private boolean solveNextByEliminationWithinGroup(Cell[] group) {
+        boolean progress = false;
+        Map<Integer, Integer> nrPossibleCellsPerNumber = new HashMap<>();
+        for (Cell cell : group) {
+            int index = cell.getIndex();
+            Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+
+            for (int value : possibleValues) {
+                int count = nrPossibleCellsPerNumber.getOrDefault(value, 0);
+                nrPossibleCellsPerNumber.put(value, count + 1);
+            }
+        }
+
+        for (Map.Entry<Integer, Integer> e : nrPossibleCellsPerNumber.entrySet()) {
+            if (e.getValue() == 1) {
+                int value = e.getKey();
+                for (Cell cell : group) {
+                    int index = cell.getIndex();
+                    Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+                    if (!possibleValues.contains(value)) {
+                        continue;
+                    }
+
+                    setCellValue(index, value);
+                    unsolvedCells.remove(index);
+                    progress = true;
+                }
+            }
+        }
+        return progress;
     }
 
     public String possibleValues() {
