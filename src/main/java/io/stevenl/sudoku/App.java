@@ -20,8 +20,13 @@ public class App {
         );
         logger.log(Level.INFO, "\n{0}", b);
 
-        b.solve();
+        Solver solver = new Solver(b);
+        try {
+            solver.solve();
+        } catch (Exception e) {
+            logger.info(e.toString());
+            logger.log(Level.INFO, "\n{0}", solver.possibleValues());
+        }
         logger.log(Level.INFO, "\n{0}", b);
-        logger.log(Level.INFO, "\n{0}", b.possibleValues());
     }
 }

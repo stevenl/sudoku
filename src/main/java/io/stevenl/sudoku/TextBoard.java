@@ -19,7 +19,7 @@ public class TextBoard extends Board {
                 int value = Integer.parseInt(String.valueOf(c));
 
                 if (0 < value && value <= SIZE) {
-                    board.setCellValue(index, value);
+                    board.getCell(index).setValue(value);
                 }
             }
             index++;
@@ -62,20 +62,6 @@ public class TextBoard extends Board {
         // Bottom border
         appendHorizontalBorder(sb);
 
-        return sb.toString();
-    }
-
-    public String possibleValues() {
-        StringBuilder sb = new StringBuilder();
-        int index = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                Cell c = getCell(index);
-                sb.append(String.format("%d (%d, %d): %s\n", index, i, j, c.getPossibleValues()));
-                index++;
-            }
-            sb.append("\n");
-        }
         return sb.toString();
     }
 

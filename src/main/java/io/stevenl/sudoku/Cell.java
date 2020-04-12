@@ -1,45 +1,49 @@
 package io.stevenl.sudoku;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 public class Cell {
-    private static final Set<Integer> ALL_POSSIBLE_VALUES =
-            new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-
-    private Set<CellGroup> observers = new HashSet<>();
-    private Set<Integer> possibleValues = new HashSet<>(ALL_POSSIBLE_VALUES);
+    private int index;
+    private int rowIndex;
+    private int columnIndex;
+    private int squareIndex;
+    private int indexInSquare;
     private int value;
 
-    public Cell() {
-        super();
+    public Cell(int index) {
+        this.index = index;
+        this.rowIndex = index / Board.SIZE;
+        this.columnIndex = index % Board.SIZE;
+
+        int squareRow = rowIndex / Board.SQUARE_SIZE;
+        int squareCol = columnIndex / Board.SQUARE_SIZE;
+        this.squareIndex = squareRow * Board.SQUARE_SIZE + squareCol;
+
+        int rowInSquare = rowIndex - squareRow * Board.SQUARE_SIZE;
+        int columnInSquare = columnIndex - squareCol * Board.SQUARE_SIZE;
+        this.indexInSquare = rowInSquare * Board.SQUARE_SIZE + columnInSquare;
     }
 
-    public void addObservers(CellGroup... observers) {
-        this.observers.addAll(Arrays.asList(observers));
+    public int getIndex() {
+        return index;
     }
 
-    public void removePossibleValue(int value) {
-        possibleValues.remove(value);
+    public int getRowIndex() {
+        return rowIndex;
     }
 
-    public Set<Integer> getPossibleValues() {
-        return Collections.unmodifiableSet(possibleValues);
+    public int getColumnIndex() {
+        return columnIndex;
     }
 
-    public int getNrPossibleValues() {
-        return possibleValues.size();
+    public int getSquareIndex() {
+        return squareIndex;
+    }
+
+    public int getIndexInSquare() {
+        return indexInSquare;
     }
 
     public void setValue(int value) {
         this.value = value;
-        possibleValues.clear();
-
-        for (CellGroup observer : observers) {
-            observer.removeWantedValue(value);
-        }
     }
 
     public int getValue() {
