@@ -1,6 +1,11 @@
 package io.stevenl.sudoku;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class App {
+    private static Logger logger = Logger.getAnonymousLogger();
+
     public static void main(String[] args) {
         TextBoard b = TextBoard.fromString(
                   "  7   9 8"
@@ -13,10 +18,10 @@ public class App {
                 + "9   51 4 "
                 + "4 5   1  "
         );
-        System.out.println(b);
+        logger.log(Level.INFO, "\n{0}", b);
 
         b.solve();
-        System.out.println(b);
-        b.printPossibleValues();
+        logger.log(Level.INFO, "\n{0}", b);
+        logger.log(Level.INFO, "\n{0}", b.possibleValues());
     }
 }
