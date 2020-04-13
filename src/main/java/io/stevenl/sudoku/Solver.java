@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Solver {
     private static final Set<Integer> ALL_POSSIBLE_VALUES =
@@ -14,6 +15,8 @@ public class Solver {
     private Board board;
     private Set<Integer> unsolvedCells;
     private Map<Integer, Set<Integer>> possibleValuesPerCell;
+
+    Set<Integer> solvable = new HashSet<>();
 
     public Solver(Board board) {
         this.board = board;
@@ -38,9 +41,20 @@ public class Solver {
                 unsolvedCells.remove(index);
             }
         }
+
+        // Initialise the queue of solvable cells
+        solvable.addAll(unsolvedCells
+                .stream()
+                .filter(index -> {
+                    Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+                    return possibleValues.size() == 1;
+                })
+                .collect(Collectors.toList())
+        );
+        //System.out.println("solvable = " + solvable);
     }
 
-    private void setCellValue(int index, int value) {
+    private Set<Integer> setCellValue(int index, int value) {
         Cell cell = board.getCell(index);
         cell.setValue(value);
 
@@ -48,6 +62,7 @@ public class Solver {
 
         // Update the possible values in the affected cells
         // (in the same row, column and square)
+        Set<Integer> affectedCells = new HashSet<>();
         Cell[][] cellGroups = {
                 board.getCellRow(index),
                 board.getCellColumn(index),
@@ -59,24 +74,35 @@ public class Solver {
                     continue;
                 }
                 int idx = affectedCell.getIndex();
+                affectedCells.add(idx);
                 possibleValuesPerCell.get(idx).remove(value);
             }
         }
+        return affectedCells;
     }
 
     public void solve() throws Exception {
+        Iterator<Integer> solvableIter = solvable.iterator();
+
         while (!unsolvedCells.isEmpty()) {
             boolean progress = false;
-            Iterator<Integer> unsolvedIter = unsolvedCells.iterator();
-            while (unsolvedIter.hasNext()) {
-                int index = unsolvedIter.next();
+            while (solvableIter.hasNext()) {
+                int index = solvableIter.next();
                 Set<Integer> possibleValues = possibleValuesPerCell.get(index);
 
                 if (possibleValues.size() == 1) {
                     int value = possibleValues.iterator().next();
-                    setCellValue(index, value);
+                    Set<Integer> affected = setCellValue(index, value);
 
-                    unsolvedIter.remove();
+                    solvableIter.remove();
+                    unsolvedCells.remove(index);
+
+                    for (int idx : affected) {
+                        if (possibleValuesPerCell.get(idx).size() == 1) {
+                            solvable.add(idx);
+                        }
+                    }
+
                     progress = true;
                 }
             }
