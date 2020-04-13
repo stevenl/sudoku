@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 public class App {
     private static Logger logger = Logger.getAnonymousLogger();
 
-    public static void main(String[] args) {
-        TextBoard b = TextBoard.fromString(
+    public static void main(String[] args) throws SudokuException {
+        Board board = new Board(
                   "  7   9 8"
                 + " 3 17   4"
                 + "     6   "
@@ -18,15 +18,18 @@ public class App {
                 + "9   51 4 "
                 + "4 5   1  "
         );
-        logger.log(Level.INFO, "\n{0}", b);
+        TextBoard textBoard = new TextBoard(board);
+        logger.log(Level.INFO, "\n{0}", textBoard);
+        logger.log(Level.INFO, "{0}", board);
 
-        Solver solver = new Solver(b);
+        Solver solver = new Solver(board);
         try {
             solver.solve();
         } catch (Exception e) {
-            logger.info(e.toString());
-            logger.log(Level.INFO, "\n{0}", solver.possibleValues());
+            logger.log(Level.WARNING, "{0}", e);
+            logger.log(Level.INFO, "\n{0}", solver.debugPossibleValues());
         }
-        logger.log(Level.INFO, "\n{0}", b);
+        logger.log(Level.INFO, "\n{0}", textBoard);
+        logger.log(Level.INFO, "{0}", board);
     }
 }
