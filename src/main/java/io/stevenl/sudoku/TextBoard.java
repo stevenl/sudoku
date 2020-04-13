@@ -33,53 +33,61 @@ public class TextBoard extends Board {
         StringBuilder sb = new StringBuilder();
 
         // Top border
-        appendHorizontalBorder(sb);
+        appendColumnLabels(sb);
+        appendHorizontalSeparator(sb);
 
-        for (int i = 0; i < SIZE; i++) {
-            sb.append("|");
-            for (int j = 0; j < SIZE; j++) {
-                int index = i * SIZE + j;
-                int value = getCell(index).getValue();
-
-                String valStr = value > 0
-                        ? String.valueOf(value)
-                        : " ";
-                sb.append(String.format(" %s", valStr));
-
-                // Square separator (vertical)
-                if (j % SQUARE_SIZE == 2 && j < SIZE - 1) {
-                    sb.append(" |");
-                }
-            }
-            sb.append(" |\n");
-
-            // Square separator (horizontal)
-            if (i % SQUARE_SIZE == 2 && i < SIZE - 1) {
+        // Main body
+        for (int row = 0; row < SIZE; row++) {
+            if (row % SQUARE_SIZE == 0 && row > 0) {
                 appendHorizontalSeparator(sb);
             }
+            appendRow(sb, row);
         }
 
         // Bottom border
-        appendHorizontalBorder(sb);
+        appendHorizontalSeparator(sb);
 
         return sb.toString();
     }
 
-    private void appendHorizontalBorder(StringBuilder sb) {
-        sb.append(" ");
-        for (int k = 0; k < SIZE + 2; k++) {
-            sb.append("--");
+    private void appendColumnLabels(StringBuilder sb) {
+        sb.append("   ");
+        for (int i = 0; i < SIZE; i++) {
+            if (i % SQUARE_SIZE == 0 && i > 0) {
+                sb.append("  ");
+            }
+            sb.append(String.format(" %d", i));
         }
-        sb.append("-\n");
+        sb.append("\n");
+    }
+
+    private void appendRow(StringBuilder sb, int row) {
+        sb.append(String.format("%d |", row));
+
+        for (int col = 0; col < SIZE; col++) {
+            // Square separator (vertical)
+            if (col % SQUARE_SIZE == 0 && col > 0) {
+                sb.append(" |");
+            }
+
+            int index = row * SIZE + col;
+            int value = getCell(index).getValue();
+
+            String valStr = value > 0
+                    ? String.valueOf(value)
+                    : " ";
+            sb.append(String.format(" %s", valStr));
+        }
+        sb.append(" |\n");
     }
 
     private void appendHorizontalSeparator(StringBuilder sb) {
-        sb.append(" ");
+        sb.append("   ");
         for (int k = 0; k < SIZE; k++) {
-            sb.append("--");
-            if (k % SQUARE_SIZE == 2 && k < SIZE - 1) {
+            if (k % SQUARE_SIZE == 0 && k > 0) {
                 sb.append("- ");
             }
+            sb.append("--");
         }
         sb.append("-\n");
     }
