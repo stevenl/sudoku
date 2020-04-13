@@ -40,17 +40,6 @@ public class Solver {
                 setCellValue(index, value);
             }
         }
-
-        // Initialise the queue of solvable cells
-        //solvable.addAll(unsolvedCells
-        //        .stream()
-        //        .filter(index -> {
-        //            Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-        //            return possibleValues.size() == 1;
-        //        })
-        //        .collect(Collectors.toList())
-        //);
-        //System.out.println("solvable = " + solvable);
     }
 
     private void setCellValue(int index, int value) throws SudokuException {
@@ -86,6 +75,7 @@ public class Solver {
     }
 
     public void solve() throws SudokuException {
+        Iteration:
         while (!unsolvedCells.isEmpty()) {
             while (!solvable.isEmpty()) {
                 int index = solvable.remove();
@@ -97,7 +87,6 @@ public class Solver {
                 solveIfSolePossibility(index);
             }
 
-            Fallback:
             for (int i = 0; i < Board.SIZE; i++) {
                 Cell[][] cellGroups = {
                         board.getCellRow(i),
@@ -106,14 +95,14 @@ public class Solver {
                 };
                 for (Cell[] cellGroup : cellGroups) {
                     if (solveIfSolePossibilityWithinGroup(cellGroup)) {
-                        break Fallback;
+                        continue Iteration;
                     }
                 }
             }
-        }
 
-        if (!unsolvedCells.isEmpty()) {
-            throw new SudokuException("Couldn't solve it");
+            if (!unsolvedCells.isEmpty()) {
+                throw new SudokuException("Couldn't solve it");
+            }
         }
     }
 
