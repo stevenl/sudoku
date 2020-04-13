@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 public class Board {
     public static final int SIZE = 9;
     public static final int SQUARE_SIZE = 3;
+    public static final int NR_CELLS = SIZE * SIZE;
 
     private Cell[] cells;
     private Cell[][] rows;
@@ -13,12 +14,12 @@ public class Board {
     private Cell[][] squares;
 
     public Board() {
-        cells   = new Cell[SIZE * SIZE];
+        cells   = new Cell[NR_CELLS];
         rows    = new Cell[SIZE][SIZE];
         columns = new Cell[SIZE][SIZE];
         squares = new Cell[SIZE][SIZE];
 
-        for (int i = 0; i < SIZE * SIZE; i++) {
+        for (int i = 0; i < NR_CELLS; i++) {
             addCell(i);
         }
     }
@@ -32,9 +33,21 @@ public class Board {
                 .map(c -> Character.digit(c, 10))
                 .toArray();
 
+        if (values.length < NR_CELLS) {
+            throw new SudokuException(String.format("Input is too short: %s", input));
+        }
+        if (values.length > NR_CELLS) {
+            throw new SudokuException(String.format("Input is too long: %s", input));
+        }
+
         int index = 0;
         for (int value : values) {
-            getCell(index).setValue(value);
+            if (value < 0 || value > SIZE) {
+                throw new SudokuException(String.format("Invalid input value: %d", value));
+            }
+            if (value != 0) {
+                getCell(index).setValue(value);
+            }
             index++;
         }
     }

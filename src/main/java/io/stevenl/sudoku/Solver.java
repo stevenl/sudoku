@@ -18,21 +18,19 @@ public class Solver {
 
     Queue<Integer> solvable = new LinkedList<>();
 
-    public Solver(Board board) throws SudokuException {
+    public Solver(Board board) {
         this.board = board;
 
         // Initialise for an empty board
-        int size = Board.SIZE;
-        int nrCells = size * size;
-        unsolvedCells = new HashSet<>(nrCells);
-        possibleValuesPerCell = new HashMap<>(nrCells);
-        for (int index = 0; index < nrCells; index++) {
+        unsolvedCells = new HashSet<>(Board.NR_CELLS);
+        possibleValuesPerCell = new HashMap<>(Board.NR_CELLS);
+        for (int index = 0; index < Board.NR_CELLS; index++) {
             unsolvedCells.add(index);
             possibleValuesPerCell.put(index, new HashSet<>(ALL_POSSIBLE_VALUES));
         }
 
         // Add the cells that have already been set
-        for (int index = 0; index < nrCells; index++) {
+        for (int index = 0; index < Board.NR_CELLS; index++) {
             Cell cell = board.getCell(index);
             int value = cell.getValue();
 
@@ -42,7 +40,7 @@ public class Solver {
         }
     }
 
-    private void setCellValue(int index, int value) throws SudokuException {
+    private void setCellValue(int index, int value) {
         Cell cell = board.getCell(index);
         cell.setValue(value);
 
@@ -81,7 +79,7 @@ public class Solver {
                 int index = solvable.remove();
 
                 if (!unsolvedCells.contains(index)) {
-                    throw new SudokuException("Already solved: " + index);
+                    throw new AssertionError("Already solved: " + index);
                 }
 
                 solveIfSolePossibility(index);
@@ -115,7 +113,7 @@ public class Solver {
         }
     }
 
-    private boolean solveIfSolePossibility(int index) throws SudokuException {
+    private boolean solveIfSolePossibility(int index) {
         Set<Integer> possibleValues = possibleValuesPerCell.get(index);
 
         if (possibleValues.size() == 1) {
@@ -127,7 +125,7 @@ public class Solver {
         return false;
     }
 
-    private boolean solveIfSolePossibilityWithinGroup(Cell[] cellGroup) throws SudokuException {
+    private boolean solveIfSolePossibilityWithinGroup(Cell[] cellGroup) {
         Map<Integer, Integer> nrPossibleCellsPerValue = new HashMap<>();
         for (Cell cell : cellGroup) {
             int index = cell.getIndex();

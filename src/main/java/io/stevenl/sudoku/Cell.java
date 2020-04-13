@@ -9,6 +9,10 @@ public class Cell {
     private int value;
 
     public Cell(int index) {
+        if (index < 0 || index >= Board.NR_CELLS) {
+            throw new IllegalArgumentException("Invalid cell index: " + index);
+        }
+
         this.index = index;
         this.rowIndex = index / Board.SIZE;
         this.columnIndex = index % Board.SIZE;
@@ -42,9 +46,9 @@ public class Cell {
         return indexInSquare;
     }
 
-    public void setValue(int value) throws SudokuException {
-        if (value < 0 || value > 9) {
-            throw new SudokuException(String.format("Invalid value: %d (index %d)", value, index));
+    public void setValue(int value) {
+        if (value < 1 || value > 9) {
+            throw new IllegalArgumentException("Invalid cell value: " + value);
         }
         this.value = value;
     }
