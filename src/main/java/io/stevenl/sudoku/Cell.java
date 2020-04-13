@@ -42,7 +42,10 @@ public class Cell {
         return indexInSquare;
     }
 
-    public void setValue(int value) {
+    public void setValue(int value) throws SudokuException {
+        if (value < 0 || value > 9) {
+            throw new SudokuException(String.format("Invalid value: %d (index %d)", value, index));
+        }
         this.value = value;
     }
 

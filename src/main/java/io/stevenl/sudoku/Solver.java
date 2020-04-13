@@ -3,10 +3,10 @@ package io.stevenl.sudoku;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Solver {
     private static final Set<Integer> ALL_POSSIBLE_VALUES =
@@ -16,48 +16,48 @@ public class Solver {
     private Set<Integer> unsolvedCells;
     private Map<Integer, Set<Integer>> possibleValuesPerCell;
 
-    Set<Integer> solvable = new HashSet<>();
+    Queue<Integer> solvable = new LinkedList<>();
 
-    public Solver(Board board) {
+    public Solver(Board board) throws SudokuException {
         this.board = board;
 
+        // Initialise for an empty board
         int size = Board.SIZE;
         int nrCells = size * size;
         unsolvedCells = new HashSet<>(nrCells);
         possibleValuesPerCell = new HashMap<>(nrCells);
-
         for (int index = 0; index < nrCells; index++) {
             unsolvedCells.add(index);
             possibleValuesPerCell.put(index, new HashSet<>(ALL_POSSIBLE_VALUES));
         }
 
-        // Update the observers with the cells that have already been set
+        // Add the cells that have already been set
         for (int index = 0; index < nrCells; index++) {
             Cell cell = board.getCell(index);
             int value = cell.getValue();
 
             if (value > 0) {
                 setCellValue(index, value);
-                unsolvedCells.remove(index);
             }
         }
 
         // Initialise the queue of solvable cells
-        solvable.addAll(unsolvedCells
-                .stream()
-                .filter(index -> {
-                    Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-                    return possibleValues.size() == 1;
-                })
-                .collect(Collectors.toList())
-        );
+        //solvable.addAll(unsolvedCells
+        //        .stream()
+        //        .filter(index -> {
+        //            Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+        //            return possibleValues.size() == 1;
+        //        })
+        //        .collect(Collectors.toList())
+        //);
         //System.out.println("solvable = " + solvable);
     }
 
-    private Set<Integer> setCellValue(int index, int value) {
+    private void setCellValue(int index, int value) throws SudokuException {
         Cell cell = board.getCell(index);
         cell.setValue(value);
 
+        unsolvedCells.remove(index);
         possibleValuesPerCell.get(index).clear();
 
         // Update the possible values in the affected cells
@@ -73,87 +73,103 @@ public class Solver {
                 if (affectedCell.getValue() > 0) {
                     continue;
                 }
+
                 int idx = affectedCell.getIndex();
-                affectedCells.add(idx);
-                possibleValuesPerCell.get(idx).remove(value);
+                Set<Integer> possibleValues = possibleValuesPerCell.get(idx);
+                if (possibleValues.contains(value)) {
+                    possibleValues.remove(value);
+                    affectedCells.add(idx);
+                }
             }
         }
-        return affectedCells;
+        addSolveableCells(affectedCells);
     }
 
-    public void solve() throws Exception {
-        Iterator<Integer> solvableIter = solvable.iterator();
-
+    public void solve() throws SudokuException {
         while (!unsolvedCells.isEmpty()) {
-            boolean progress = false;
-            while (solvableIter.hasNext()) {
-                int index = solvableIter.next();
-                Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+            while (!solvable.isEmpty()) {
+                int index = solvable.remove();
 
-                if (possibleValues.size() == 1) {
-                    int value = possibleValues.iterator().next();
-                    Set<Integer> affected = setCellValue(index, value);
+                if (!unsolvedCells.contains(index)) {
+                    throw new SudokuException("Already solved: " + index);
+                }
 
-                    solvableIter.remove();
-                    unsolvedCells.remove(index);
+                solveIfSolePossibility(index);
+            }
 
-                    for (int idx : affected) {
-                        if (possibleValuesPerCell.get(idx).size() == 1) {
-                            solvable.add(idx);
-                        }
+            Fallback:
+            for (int i = 0; i < Board.SIZE; i++) {
+                Cell[][] cellGroups = {
+                        board.getCellRow(i),
+                        board.getCellColumn(i),
+                        board.getCellSquare(i)
+                };
+                for (Cell[] cellGroup : cellGroups) {
+                    if (solveIfSolePossibilityWithinGroup(cellGroup)) {
+                        break Fallback;
                     }
-
-                    progress = true;
                 }
             }
+        }
 
-            if (!progress) {
-                for (int i = 0; i < Board.SIZE; i++) {
-                    progress = progress || solveNextByEliminationWithinGroup(board.getCellRow(i));
-                    progress = progress || solveNextByEliminationWithinGroup(board.getCellColumn(i));
-                    progress = progress || solveNextByEliminationWithinGroup(board.getCellSquare(i));
-                }
-            }
+        if (!unsolvedCells.isEmpty()) {
+            throw new SudokuException("Couldn't solve it");
+        }
+    }
 
-            if (!progress) {
-                throw new Exception("Couldn't solve it");
+    private void addSolveableCells(Set<Integer> cells) {
+        for (int index : cells) {
+            int nrPossibleValues = possibleValuesPerCell.get(index).size();
+            if (nrPossibleValues == 1) {
+                solvable.add(index);
             }
         }
     }
 
-    private boolean solveNextByEliminationWithinGroup(Cell[] group) {
-        boolean progress = false;
-        Map<Integer, Integer> nrPossibleCellsPerNumber = new HashMap<>();
-        for (Cell cell : group) {
+    private boolean solveIfSolePossibility(int index) throws SudokuException {
+        Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+
+        if (possibleValues.size() == 1) {
+            int value = possibleValues.iterator().next();
+            setCellValue(index, value);
+
+            return true;
+        }
+        return false;
+    }
+
+    private boolean solveIfSolePossibilityWithinGroup(Cell[] cellGroup) throws SudokuException {
+        Map<Integer, Integer> nrPossibleCellsPerValue = new HashMap<>();
+        for (Cell cell : cellGroup) {
             int index = cell.getIndex();
             Set<Integer> possibleValues = possibleValuesPerCell.get(index);
 
             for (int value : possibleValues) {
-                int count = nrPossibleCellsPerNumber.getOrDefault(value, 0);
-                nrPossibleCellsPerNumber.put(value, count + 1);
+                int count = nrPossibleCellsPerValue.getOrDefault(value, 0);
+                nrPossibleCellsPerValue.put(value, count + 1);
             }
         }
 
-        for (Map.Entry<Integer, Integer> e : nrPossibleCellsPerNumber.entrySet()) {
+        // Find where a value is possible only in one cell within a group (e.g. row, column or square)
+        for (Map.Entry<Integer, Integer> e : nrPossibleCellsPerValue.entrySet()) {
             if (e.getValue() == 1) {
                 int value = e.getKey();
-                for (Cell cell : group) {
+
+                for (Cell cell : cellGroup) {
                     int index = cell.getIndex();
                     Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-                    if (!possibleValues.contains(value)) {
-                        continue;
-                    }
 
-                    setCellValue(index, value);
-                    unsolvedCells.remove(index);
-                    progress = true;
+                    if (possibleValues.contains(value)) {
+                        setCellValue(index, value);
+                        return true;
+                    }
                 }
             }
         }
-        return progress;
+        return false;
     }
 
-    public String possibleValues() {
+    public String debugPossibleValues() {
         StringBuilder sb = new StringBuilder();
         int index = 0;
         for (int i = 0; i < Board.SIZE; i++) {
