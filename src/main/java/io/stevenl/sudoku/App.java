@@ -7,8 +7,7 @@ public class App {
     private static Logger logger = Logger.getAnonymousLogger();
 
     public static void main(String[] args) throws SudokuException {
-        //Board board = new Board("000080000095002030023000007060009000500476008000200090400000150030500760000010000");
-        Board board = new Board("007000908030170004000006000698740300003010400001039762000400000900051040405000100");
+        Board board = new Board("000000080005073090000900300000200709900136004403009000001005000060840900070000000");
 
         TextBoard textBoard = new TextBoard(board);
         logger.log(Level.INFO, "\n{0}", textBoard);
