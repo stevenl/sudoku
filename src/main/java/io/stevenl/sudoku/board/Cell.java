@@ -1,4 +1,4 @@
-package io.stevenl.sudoku;
+package io.stevenl.sudoku.board;
 
 public class Cell {
     private int index;

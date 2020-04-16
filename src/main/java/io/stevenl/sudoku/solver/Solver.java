@@ -1,4 +1,8 @@
-package io.stevenl.sudoku;
+package io.stevenl.sudoku.solver;
+
+import io.stevenl.sudoku.SudokuException;
+import io.stevenl.sudoku.board.Board;
+import io.stevenl.sudoku.board.Cell;
 
 import java.util.Arrays;
 import java.util.HashMap;

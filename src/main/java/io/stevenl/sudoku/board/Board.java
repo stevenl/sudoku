@@ -1,4 +1,6 @@
-package io.stevenl.sudoku;
+package io.stevenl.sudoku.board;
+
+import io.stevenl.sudoku.SudokuException;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

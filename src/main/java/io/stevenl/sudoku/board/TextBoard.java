@@ -1,4 +1,4 @@
-package io.stevenl.sudoku;
+package io.stevenl.sudoku.board;
 
 public class TextBoard {
     private Board board;

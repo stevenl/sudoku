@@ -1,5 +1,9 @@
 package io.stevenl.sudoku;
 
+import io.stevenl.sudoku.board.Board;
+import io.stevenl.sudoku.board.TextBoard;
+import io.stevenl.sudoku.solver.Solver;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
