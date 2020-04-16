@@ -1,5 +1,7 @@
 package io.stevenl.sudoku.board;
 
+import io.stevenl.sudoku.Constants;
+
 public class TextBoard {
     private Board board;
 
@@ -16,8 +18,8 @@ public class TextBoard {
         appendHorizontalSeparator(sb);
 
         // Main body
-        for (int row = 0; row < Board.SIZE; row++) {
-            if (row % Board.SQUARE_SIZE == 0 && row > 0) {
+        for (int row = 0; row < Constants.SIZE; row++) {
+            if (row % Constants.SQUARE_SIZE == 0 && row > 0) {
                 appendHorizontalSeparator(sb);
             }
             appendRow(sb, row);
@@ -31,8 +33,8 @@ public class TextBoard {
 
     private void appendColumnLabels(StringBuilder sb) {
         sb.append("   ");
-        for (int i = 0; i < Board.SIZE; i++) {
-            if (i % Board.SQUARE_SIZE == 0 && i > 0) {
+        for (int i = 0; i < Constants.SIZE; i++) {
+            if (i % Constants.SQUARE_SIZE == 0 && i > 0) {
                 sb.append("  ");
             }
             sb.append(String.format(" %d", i));
@@ -43,13 +45,13 @@ public class TextBoard {
     private void appendRow(StringBuilder sb, int row) {
         sb.append(String.format("%d |", row));
 
-        for (int col = 0; col < Board.SIZE; col++) {
+        for (int col = 0; col < Constants.SIZE; col++) {
             // Square separator (vertical)
-            if (col % Board.SQUARE_SIZE == 0 && col > 0) {
+            if (col % Constants.SQUARE_SIZE == 0 && col > 0) {
                 sb.append(" |");
             }
 
-            int index = row * Board.SIZE + col;
+            int index = row * Constants.SIZE + col;
             int value = board.getCell(index).getValue();
 
             String valStr = value > 0
@@ -62,8 +64,8 @@ public class TextBoard {
 
     private void appendHorizontalSeparator(StringBuilder sb) {
         sb.append("   ");
-        for (int k = 0; k < Board.SIZE; k++) {
-            if (k % Board.SQUARE_SIZE == 0 && k > 0) {
+        for (int k = 0; k < Constants.SIZE; k++) {
+            if (k % Constants.SQUARE_SIZE == 0 && k > 0) {
                 sb.append("- ");
             }
             sb.append("--");

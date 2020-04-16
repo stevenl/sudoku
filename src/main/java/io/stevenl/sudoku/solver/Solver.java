@@ -1,10 +1,10 @@
 package io.stevenl.sudoku.solver;
 
+import io.stevenl.sudoku.Constants;
 import io.stevenl.sudoku.SudokuException;
 import io.stevenl.sudoku.board.Board;
 import io.stevenl.sudoku.board.Cell;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,8 +15,6 @@ import java.util.logging.Logger;
 
 public class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
-    private static final Set<Integer> ALL_POSSIBLE_VALUES =
-            new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
     private Board board;
     private Set<Integer> unsolvedCells;
@@ -28,15 +26,15 @@ public class Solver {
         this.board = board;
 
         // Initialise for an empty board
-        unsolvedCells = new HashSet<>(Board.NR_CELLS);
-        possibleValuesPerCell = new HashMap<>(Board.NR_CELLS);
-        for (int index = 0; index < Board.NR_CELLS; index++) {
+        unsolvedCells = new HashSet<>(Constants.NR_CELLS);
+        possibleValuesPerCell = new HashMap<>(Constants.NR_CELLS);
+        for (int index = 0; index < Constants.NR_CELLS; index++) {
             unsolvedCells.add(index);
-            possibleValuesPerCell.put(index, new HashSet<>(ALL_POSSIBLE_VALUES));
+            possibleValuesPerCell.put(index, new HashSet<>(Constants.POSSIBLE_CELL_VALUES));
         }
 
         // Add the cells that have already been set
-        for (int index = 0; index < Board.NR_CELLS; index++) {
+        for (int index = 0; index < Constants.NR_CELLS; index++) {
             Cell cell = board.getCell(index);
             int value = cell.getValue();
 
@@ -94,7 +92,7 @@ public class Solver {
                 solveIfSolePossibility(index);
             }
 
-            for (int i = 0; i < Board.SIZE; i++) {
+            for (int i = 0; i < Constants.SIZE; i++) {
                 Cell[][] cellGroups = {
                         board.getRow(i),
                         board.getColumn(i),
@@ -168,8 +166,8 @@ public class Solver {
     public String debugPossibleValues() {
         StringBuilder sb = new StringBuilder();
         int index = 0;
-        for (int i = 0; i < Board.SIZE; i++) {
-            for (int j = 0; j < Board.SIZE; j++) {
+        for (int i = 0; i < Constants.SIZE; i++) {
+            for (int j = 0; j < Constants.SIZE; j++) {
                 Set<Integer> possibleValues = possibleValuesPerCell.get(index);
                 sb.append(String.format("%d (%d, %d): %s%n", index, i, j, possibleValues));
                 index++;
