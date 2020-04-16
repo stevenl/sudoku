@@ -65,19 +65,16 @@ public class Board {
         return cells[index];
     }
 
-    public Cell[] getCellRow(int index) {
-        int rowIdx = getCell(index).getRowIndex();
+    public Cell[] getRow(int rowIdx) {
         return rows[rowIdx];
     }
 
-    public Cell[] getCellColumn(int index) {
-        int colIdx = getCell(index).getColumnIndex();
+    public Cell[] getColumn(int colIdx) {
         return columns[colIdx];
     }
 
-    public Cell[] getCellSquare(int index) {
-        int sqIdx = getCell(index).getSquareIndex();
-        return squares[sqIdx];
+    public Cell[] getSquare(int squareIdx) {
+        return squares[squareIdx];
     }
 
     @Override

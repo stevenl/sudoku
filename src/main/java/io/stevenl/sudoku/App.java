@@ -17,8 +17,9 @@ public class App {
         try {
             solver.solve();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "{0}", e);
-            logger.log(Level.INFO, "\n{0}", solver.debugPossibleValues());
+
+            logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues());
+            logger.log(Level.WARNING, "{0}", e.toString());
         }
         logger.log(Level.INFO, "\n{0}", textBoard);
         logger.log(Level.INFO, "{0}", board);

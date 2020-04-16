@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class Solver {
+    private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
     private static final Set<Integer> ALL_POSSIBLE_VALUES =
             new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
@@ -51,9 +53,9 @@ public class Solver {
         // (in the same row, column and square)
         Set<Integer> affectedCells = new HashSet<>();
         Cell[][] cellGroups = {
-                board.getCellRow(index),
-                board.getCellColumn(index),
-                board.getCellSquare(index)
+                board.getRow(cell.getRowIndex()),
+                board.getColumn(cell.getColumnIndex()),
+                board.getSquare(cell.getSquareIndex())
         };
         for (Cell[] cellGroup : cellGroups) {
             for (Cell affectedCell : cellGroup) {
@@ -70,6 +72,9 @@ public class Solver {
             }
         }
         addSolveableCells(affectedCells);
+
+        //LOGGER.info(String.format("SET %d = %d (%d, %d) %s", index, value, cell.getRowIndex(), cell.getColumnIndex(), affectedCells));
+        //try { System.in.read(); } catch (IOException e) { LOGGER.warning(e.toString()); }
     }
 
     public void solve() throws SudokuException {
@@ -87,9 +92,9 @@ public class Solver {
 
             for (int i = 0; i < Board.SIZE; i++) {
                 Cell[][] cellGroups = {
-                        board.getCellRow(i),
-                        board.getCellColumn(i),
-                        board.getCellSquare(i)
+                        board.getRow(i),
+                        board.getColumn(i),
+                        board.getSquare(i)
                 };
                 for (Cell[] cellGroup : cellGroups) {
                     if (solveIfSolePossibilityWithinGroup(cellGroup)) {
@@ -99,7 +104,7 @@ public class Solver {
             }
 
             if (!unsolvedCells.isEmpty()) {
-                throw new SudokuException("Couldn't solve it");
+                throw new SudokuException(String.format("Couldn't solve it. There are still %d unsolved cells", unsolvedCells.size()));
             }
         }
     }
