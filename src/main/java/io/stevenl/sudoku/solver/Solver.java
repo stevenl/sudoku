@@ -7,9 +7,7 @@ import io.stevenl.sudoku.board.Cell;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -20,7 +18,7 @@ public class Solver {
     private Set<Integer> unsolvedCells;
     private Map<Integer, Set<Integer>> possibleValuesPerCell;
 
-    Queue<Integer> solvable = new LinkedList<>();
+    Set<Integer> solvable = new HashSet<>();
 
     public Solver(Board board) {
         this.board = board;
@@ -48,61 +46,63 @@ public class Solver {
         Cell cell = board.getCell(index);
         cell.setValue(value);
 
+        solvable.remove(index);
         unsolvedCells.remove(index);
         possibleValuesPerCell.get(index).clear();
 
-        // Update the possible values in the affected cells
-        // (in the same row, column and square)
-        Set<Integer> affectedCells = new HashSet<>();
-        Cell[][] cellGroups = {
-                board.getRow(cell.getRowIndex()),
-                board.getColumn(cell.getColumnIndex()),
-                board.getSquare(cell.getSquareIndex())
-        };
-        for (Cell[] cellGroup : cellGroups) {
-            for (Cell affectedCell : cellGroup) {
-                if (affectedCell.getValue() > 0) {
-                    continue;
-                }
-
-                int idx = affectedCell.getIndex();
-                Set<Integer> possibleValues = possibleValuesPerCell.get(idx);
-                if (possibleValues.contains(value)) {
-                    possibleValues.remove(value);
-                    affectedCells.add(idx);
-                }
-            }
-        }
-        addSolveableCells(affectedCells);
+        // We can remove this value from the possible values for the cells in
+        // the same row, column, and square.
+        removePossibleValueForAffectedCells(cell);
 
         //LOGGER.info(String.format("SET %d = %d (%d, %d) %s", index, value, cell.getRowIndex(), cell.getColumnIndex(), affectedCells));
         //try { System.in.read(); } catch (IOException e) { LOGGER.warning(e.toString()); }
     }
 
-    public void solve() throws SudokuException {
-        Iteration:
-        while (!unsolvedCells.isEmpty()) {
-            while (!solvable.isEmpty()) {
-                int index = solvable.remove();
+    private void removePossibleValueForAffectedCells(Cell cell) {
+        int value = cell.getValue();
 
-                if (!unsolvedCells.contains(index)) {
-                    throw new AssertionError("Already solved: " + index);
+        Cell[][] affectedSegments = {
+                board.getRow(cell.getRowIndex()),
+                board.getColumn(cell.getColumnIndex()),
+                board.getSquare(cell.getSquareIndex())
+        };
+        for (Cell[] segment : affectedSegments) {
+            for (Cell affectedCell : segment) {
+                if (affectedCell.getValue() > 0) {
+                    // No need to update cells that have already been solved
+                    continue;
                 }
 
-                solveIfSolePossibility(index);
+                int index = affectedCell.getIndex();
+                removePossibleValue(index, value);
+            }
+        }
+    }
+
+    private void removePossibleValue(int index, int value) {
+        Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+        if (possibleValues.contains(value)) {
+            possibleValues.remove(value);
+
+            // We can mark the cell as solvable if it only has 1 remaining possible value
+            if (possibleValues.size() == 1) {
+                solvable.add(index);
+            }
+        }
+    }
+
+    public void solve() throws SudokuException {
+        while (!unsolvedCells.isEmpty()) {
+            Cell hint = nextHintSolePossibility();
+            if (hint != null) {
+                setCellValue(hint.getIndex(), hint.getValue());
+                continue;
             }
 
-            for (int i = 0; i < Constants.SIZE; i++) {
-                Cell[][] cellGroups = {
-                        board.getRow(i),
-                        board.getColumn(i),
-                        board.getSquare(i)
-                };
-                for (Cell[] cellGroup : cellGroups) {
-                    if (solveIfSolePossibilityWithinGroup(cellGroup)) {
-                        continue Iteration;
-                    }
-                }
+            hint = nextHintSolePossibilityWithinSegment();
+            if (hint != null) {
+                setCellValue(hint.getIndex(), hint.getValue());
+                continue;
             }
 
             if (!unsolvedCells.isEmpty()) {
@@ -111,56 +111,70 @@ public class Solver {
         }
     }
 
-    private void addSolveableCells(Set<Integer> cells) {
-        for (int index : cells) {
-            int nrPossibleValues = possibleValuesPerCell.get(index).size();
-            if (nrPossibleValues == 1) {
-                solvable.add(index);
+    private Cell nextHintSolePossibility() {
+        if (!solvable.isEmpty()) {
+            int index = solvable.iterator().next();
+
+            Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+            if (possibleValues.size() != 1) {
+                throw new AssertionError("Solvable cell has no solution");
+            }
+            int value = possibleValues.iterator().next();
+
+            return new Cell(index, value);
+        }
+        return null;
+    }
+
+    private Cell nextHintSolePossibilityWithinSegment() {
+        for (int i = 0; i < Constants.SIZE; i++) {
+            Cell[][] segments = {
+                    board.getRow(i),
+                    board.getColumn(i),
+                    board.getSquare(i)
+            };
+            for (Cell[] segment : segments) {
+                Cell hint = nextHintSolePossibilityWithinSegment(segment);
+                if (hint != null) {
+                    return hint;
+                }
             }
         }
+        return null;
     }
 
-    private boolean solveIfSolePossibility(int index) {
-        Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+    private Map<Integer, Set<Integer>> getPossibleCellsPerValue(Cell[] segment) {
+        Map<Integer, Set<Integer>> possibleCellsPerValue = new HashMap<>();
 
-        if (possibleValues.size() == 1) {
-            int value = possibleValues.iterator().next();
-            setCellValue(index, value);
-
-            return true;
-        }
-        return false;
-    }
-
-    private boolean solveIfSolePossibilityWithinGroup(Cell[] cellGroup) {
-        Map<Integer, Integer> nrPossibleCellsPerValue = new HashMap<>();
-        for (Cell cell : cellGroup) {
+        for (Cell cell : segment) {
             int index = cell.getIndex();
             Set<Integer> possibleValues = possibleValuesPerCell.get(index);
 
             for (int value : possibleValues) {
-                int count = nrPossibleCellsPerValue.getOrDefault(value, 0);
-                nrPossibleCellsPerValue.put(value, count + 1);
-            }
-        }
-
-        // Find where a value is possible only in one cell within a group (e.g. row, column or square)
-        for (Map.Entry<Integer, Integer> e : nrPossibleCellsPerValue.entrySet()) {
-            if (e.getValue() == 1) {
-                int value = e.getKey();
-
-                for (Cell cell : cellGroup) {
-                    int index = cell.getIndex();
-                    Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-
-                    if (possibleValues.contains(value)) {
-                        setCellValue(index, value);
-                        return true;
-                    }
+                if (!possibleCellsPerValue.containsKey(value)) {
+                    possibleCellsPerValue.put(value, new HashSet<>());
                 }
+                Set<Integer> possibleCells = possibleCellsPerValue.get(value);
+                possibleCells.add(index);
             }
         }
-        return false;
+        return possibleCellsPerValue;
+    }
+
+    private Cell nextHintSolePossibilityWithinSegment(Cell[] segment) {
+        Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
+
+        // Find where a value is possible only in one cell within a segment (e.g. row, column or square)
+        for (Map.Entry<Integer, Set<Integer>> e : possibleCellsPerValue.entrySet()) {
+            int value = e.getKey();
+            Set<Integer> possibleCells = e.getValue();
+
+            if (possibleCells.size() == 1) {
+                int index = possibleCells.iterator().next();
+                return new Cell(index, value);
+            }
+        }
+        return null;
     }
 
     public String debugPossibleValues() {

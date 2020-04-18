@@ -28,6 +28,11 @@ public class Cell {
         this.indexInSquare = rowInSquare * Constants.SQUARE_SIZE + columnInSquare;
     }
 
+    public Cell(int index, int value) {
+        this(index);
+        this.value = value;
+    }
+
     public int getIndex() {
         return index;
     }

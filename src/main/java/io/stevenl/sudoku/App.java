@@ -11,7 +11,7 @@ public class App {
     private static Logger logger = Logger.getAnonymousLogger();
 
     public static void main(String[] args) throws SudokuException {
-        Board board = new Board("000000080005073090000900300000200709900136004403009000001005000060840900070000000");
+        Board board = new Board("000000080005073090000900300000200709900136004403009000001005000060840900070000000"); // evil
 
         TextBoard textBoard = new TextBoard(board);
         logger.log(Level.INFO, "\n{0}", textBoard);
@@ -23,7 +23,7 @@ public class App {
         } catch (Exception e) {
 
             logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues());
-            logger.log(Level.WARNING, "{0}", e.toString());
+            logger.log(Level.WARNING, "{0}", e);
         }
         logger.log(Level.INFO, "\n{0}", textBoard);
         logger.log(Level.INFO, "{0}", board);
