@@ -15,15 +15,15 @@ public class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
 
     private Board board;
+    private Set<Integer> solvable;
     private Set<Integer> unsolvedCells;
     private Map<Integer, Set<Integer>> possibleValuesPerCell;
-
-    Set<Integer> solvable = new HashSet<>();
 
     public Solver(Board board) {
         this.board = board;
 
         // Initialise for an empty board
+        solvable = new HashSet<>(Board.NR_CELLS);
         unsolvedCells = new HashSet<>(Board.NR_CELLS);
         possibleValuesPerCell = new HashMap<>(Board.NR_CELLS);
         for (int index = 0; index < Board.NR_CELLS; index++) {
@@ -127,13 +127,9 @@ public class Solver {
     }
 
     private Cell nextHintSolePossibilityWithinSegment() {
-        for (int i = 0; i < Board.SIZE; i++) {
-            Cell[][] segments = {
-                    board.getRow(i),
-                    board.getColumn(i),
-                    board.getSquare(i)
-            };
-            for (Cell[] segment : segments) {
+        for (SegmentType segmentType : SegmentType.SEGMENT_TYPES) {
+            for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
+                Cell[] segment = board.getSegment(segmentType, segmentIndex);
                 Cell hint = nextHintSolePossibilityWithinSegment(segment);
                 if (hint != null) {
                     return hint;
@@ -207,5 +203,4 @@ public class Solver {
 
         return sb.toString();
     }
-
 }
