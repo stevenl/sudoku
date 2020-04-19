@@ -67,16 +67,34 @@ public class Board {
         return cells[index];
     }
 
-    public Cell[] getRow(int rowIdx) {
-        return rows[rowIdx];
+    public Cell[] getRow(int rowIndex) {
+        return rows[rowIndex];
     }
 
-    public Cell[] getColumn(int colIdx) {
-        return columns[colIdx];
+    public Cell[] getColumn(int colIndex) {
+        return columns[colIndex];
     }
 
-    public Cell[] getSquare(int squareIdx) {
-        return squares[squareIdx];
+    public Cell[] getSquare(int squareIndex) {
+        return squares[squareIndex];
+    }
+
+    public Cell[] getSegment(SegmentType segmentType, int segmentIndex) {
+        Cell[] segmentCells;
+        switch (segmentType) {
+            case ROW:
+                segmentCells = getRow(segmentIndex);
+                break;
+            case COLUMN:
+                segmentCells = getColumn(segmentIndex);
+                break;
+            case SQUARE:
+                segmentCells = getSquare(segmentIndex);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + segmentType);
+        }
+        return segmentCells;
     }
 
     @Override

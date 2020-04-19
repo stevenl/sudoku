@@ -180,7 +180,7 @@ public class Solver {
     public String debugPossibleValues(SegmentType segmentType) {
         StringBuilder sb = new StringBuilder();
         for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
-            Cell[] cells = getSegment(segmentType, segmentIndex);
+            Cell[] cells = board.getSegment(segmentType, segmentIndex);
 
             for (Cell cell : cells) {
                 int index = cell.getIndex();
@@ -195,7 +195,7 @@ public class Solver {
 
     public String debugPossibleValues(SegmentType segmentType, int segmentIndex) {
         StringBuilder sb = new StringBuilder();
-        Cell[] cells = getSegment(segmentType, segmentIndex);
+        Cell[] cells = board.getSegment(segmentType, segmentIndex);
 
         for (Cell cell : cells) {
             int index = cell.getIndex();
@@ -208,21 +208,4 @@ public class Solver {
         return sb.toString();
     }
 
-    private Cell[] getSegment(SegmentType segmentType, int segmentIndex) {
-        Cell[] cells;
-        switch (segmentType) {
-            case ROW:
-                cells = board.getRow(segmentIndex);
-                break;
-            case COLUMN:
-                cells = board.getColumn(segmentIndex);
-                break;
-            case SQUARE:
-                cells = board.getSquare(segmentIndex);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + segmentType);
-        }
-        return cells;
-    }
 }
