@@ -1,6 +1,5 @@
 package io.stevenl.sudoku.solver;
 
-import io.stevenl.sudoku.Constants;
 import io.stevenl.sudoku.SudokuException;
 import io.stevenl.sudoku.board.Board;
 import io.stevenl.sudoku.board.Cell;
@@ -25,15 +24,15 @@ public class Solver {
         this.board = board;
 
         // Initialise for an empty board
-        unsolvedCells = new HashSet<>(Constants.NR_CELLS);
-        possibleValuesPerCell = new HashMap<>(Constants.NR_CELLS);
-        for (int index = 0; index < Constants.NR_CELLS; index++) {
+        unsolvedCells = new HashSet<>(Board.NR_CELLS);
+        possibleValuesPerCell = new HashMap<>(Board.NR_CELLS);
+        for (int index = 0; index < Board.NR_CELLS; index++) {
             unsolvedCells.add(index);
-            possibleValuesPerCell.put(index, new HashSet<>(Constants.POSSIBLE_CELL_VALUES));
+            possibleValuesPerCell.put(index, new HashSet<>(Cell.POSSIBLE_VALUES));
         }
 
         // Add the cells that have already been set
-        for (int index = 0; index < Constants.NR_CELLS; index++) {
+        for (int index = 0; index < Board.NR_CELLS; index++) {
             Cell cell = board.getCell(index);
             int value = cell.getValue();
 
@@ -128,7 +127,7 @@ public class Solver {
     }
 
     private Cell nextHintSolePossibilityWithinSegment() {
-        for (int i = 0; i < Constants.SIZE; i++) {
+        for (int i = 0; i < Board.SIZE; i++) {
             Cell[][] segments = {
                     board.getRow(i),
                     board.getColumn(i),
@@ -180,7 +179,7 @@ public class Solver {
 
     public String debugPossibleValues(SegmentType segmentType) {
         StringBuilder sb = new StringBuilder();
-        for (int segmentIndex = 0; segmentIndex < Constants.SIZE; segmentIndex++) {
+        for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
             Cell[] cells = getSegment(segmentType, segmentIndex);
 
             for (Cell cell : cells) {
