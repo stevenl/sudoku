@@ -1,6 +1,7 @@
 package io.stevenl.sudoku;
 
 import io.stevenl.sudoku.board.Board;
+import io.stevenl.sudoku.board.SegmentType;
 import io.stevenl.sudoku.board.TextBoard;
 import io.stevenl.sudoku.solver.Solver;
 
@@ -22,7 +23,8 @@ public class App {
             solver.solve();
         } catch (Exception e) {
 
-            logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues());
+            logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues(SegmentType.COLUMN, 0));
+            logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues(SegmentType.SQUARE, 6));
             logger.log(Level.WARNING, "{0}", e);
         }
         logger.log(Level.INFO, "\n{0}", textBoard);

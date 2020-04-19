@@ -4,6 +4,7 @@ import io.stevenl.sudoku.Constants;
 import io.stevenl.sudoku.SudokuException;
 import io.stevenl.sudoku.board.Board;
 import io.stevenl.sudoku.board.Cell;
+import io.stevenl.sudoku.board.SegmentType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -177,17 +178,52 @@ public class Solver {
         return null;
     }
 
-    public String debugPossibleValues() {
+    public String debugPossibleValues(SegmentType segmentType) {
         StringBuilder sb = new StringBuilder();
-        int index = 0;
-        for (int i = 0; i < Constants.SIZE; i++) {
-            for (int j = 0; j < Constants.SIZE; j++) {
+        for (int segmentIndex = 0; segmentIndex < Constants.SIZE; segmentIndex++) {
+            Cell[] cells = getSegment(segmentType, segmentIndex);
+
+            for (Cell cell : cells) {
+                int index = cell.getIndex();
                 Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-                sb.append(String.format("%d (%d, %d): %s%n", index, i, j, possibleValues));
-                index++;
+                sb.append(String.format("%s %d (%d, %d): %s%n", segmentType, segmentIndex,
+                        cell.getRowIndex(), cell.getColumnIndex(), possibleValues));
             }
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    public String debugPossibleValues(SegmentType segmentType, int segmentIndex) {
+        StringBuilder sb = new StringBuilder();
+        Cell[] cells = getSegment(segmentType, segmentIndex);
+
+        for (Cell cell : cells) {
+            int index = cell.getIndex();
+            Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+            sb.append(String.format("%s %d (%d, %d): %s%n", segmentType, segmentIndex,
+                    cell.getRowIndex(), cell.getColumnIndex(), possibleValues));
+        }
+        sb.append("\n");
+
+        return sb.toString();
+    }
+
+    private Cell[] getSegment(SegmentType segmentType, int segmentIndex) {
+        Cell[] cells;
+        switch (segmentType) {
+            case ROW:
+                cells = board.getRow(segmentIndex);
+                break;
+            case COLUMN:
+                cells = board.getColumn(segmentIndex);
+                break;
+            case SQUARE:
+                cells = board.getSquare(segmentIndex);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + segmentType);
+        }
+        return cells;
     }
 }
