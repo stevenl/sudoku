@@ -7,9 +7,11 @@ import io.stevenl.sudoku.board.SegmentType;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
@@ -55,7 +57,6 @@ public class Solver {
         removePossibleValueForAffectedCells(cell);
 
         //LOGGER.info(String.format("SET %d = %d (%d, %d) %s", index, value, cell.getRowIndex(), cell.getColumnIndex(), affectedCells));
-        //try { System.in.read(); } catch (IOException e) { LOGGER.warning(e.toString()); }
     }
 
     private void removePossibleValueForAffectedCells(Cell cell) {
@@ -130,9 +131,82 @@ public class Solver {
         for (SegmentType segmentType : SegmentType.SEGMENT_TYPES) {
             for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
                 Cell[] segment = board.getSegment(segmentType, segmentIndex);
-                Cell hint = nextHintSolePossibilityWithinSegment(segment);
+                Cell hint = nextHintHard(segment);
                 if (hint != null) {
                     return hint;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Cell nextHintSolePossibilityWithinSegment(Cell[] segment) {
+        Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
+
+        // Find where a value is possible only in one cell within a segment (e.g. row, column or square)
+        for (Map.Entry<Integer, Set<Integer>> e : possibleCellsPerValue.entrySet()) {
+            int value = e.getKey();
+            Set<Integer> possibleCells = e.getValue();
+
+            if (possibleCells.size() == 1) {
+                int index = possibleCells.iterator().next();
+                return new Cell(index, value);
+            }
+        }
+        return null;
+    }
+
+    public Cell nextHintHard(Cell[] segment) {
+        Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
+
+        // Find the value combinations that have number of possible cells matching the number of values in the
+        // combination. This means we can rules out other possible values from those cells.
+        // E.g. if values 4 and 9 are only possible in cells 55 and 74, and cell 55 has possible values 3, 4, 8, 9,
+        // then we can rule out values 3 and 8 from cell 55.
+
+        // Group the values by the number of possible cells,
+        // i.e. nrPossibleCells => list of values with that number of possible cells
+        Map<Integer, List<Integer>> nrPossibleCells2Values = possibleCellsPerValue
+                .keySet().stream().collect(
+                        Collectors.groupingBy(v -> possibleCellsPerValue.get(v).size()));
+        //LOGGER.info("HERE = " + nrPossibleCells2Values.toString());
+
+        // nrPossibleCells => combinations of values with that number of cells
+        Map<Integer, List<List<Integer>>> nrPossibleCells2ValueCombinations = nrPossibleCells2Values
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> {
+                    int nrPossibleCells = e.getKey();
+                    List<Integer> values = e.getValue();
+                    return Combinations.combinations(values, nrPossibleCells);
+                }));
+        //LOGGER.info("COMBOS = " + nrPossibleCells2ValueCombinations);
+
+        //
+        for (Map.Entry<Integer, List<List<Integer>>> e : nrPossibleCells2ValueCombinations.entrySet()) {
+            int nrPossibleCells = e.getKey();
+            List<List<Integer>> valueCombinations = e.getValue();
+
+            for (List<Integer> valueCombo : valueCombinations) {
+                Set<Integer> possibleCellsCombined = valueCombo.stream()
+                        .map(possibleCellsPerValue::get)
+                        .reduce((cells1, cells2) -> {
+                            Set<Integer> union = new HashSet<>(cells1);
+                            union.addAll(cells2);
+                            return union;
+                        })
+                        .orElse(Set.of());
+                if (possibleCellsCombined.size() == nrPossibleCells) {
+                    for (int cell : possibleCellsCombined) {
+                        Set<Integer> possibleValues = possibleValuesPerCell.get(cell);
+                        possibleValues.retainAll(valueCombo);
+                    }
+
+                    // Special case: This can be solved
+                    if (nrPossibleCells == 1) {
+                        int index = possibleCellsCombined.iterator().next();
+                        int value = possibleValuesPerCell.get(index).iterator().next();
+                        return new Cell(index, value);
+                    }
                 }
             }
         }
@@ -157,34 +231,10 @@ public class Solver {
         return possibleCellsPerValue;
     }
 
-    private Cell nextHintSolePossibilityWithinSegment(Cell[] segment) {
-        Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
-
-        // Find where a value is possible only in one cell within a segment (e.g. row, column or square)
-        for (Map.Entry<Integer, Set<Integer>> e : possibleCellsPerValue.entrySet()) {
-            int value = e.getKey();
-            Set<Integer> possibleCells = e.getValue();
-
-            if (possibleCells.size() == 1) {
-                int index = possibleCells.iterator().next();
-                return new Cell(index, value);
-            }
-        }
-        return null;
-    }
-
     public String debugPossibleValues(SegmentType segmentType) {
         StringBuilder sb = new StringBuilder();
         for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
-            Cell[] cells = board.getSegment(segmentType, segmentIndex);
-
-            for (Cell cell : cells) {
-                int index = cell.getIndex();
-                Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-                sb.append(String.format("%s %d (%d, %d): %s%n", segmentType, segmentIndex,
-                        cell.getRowIndex(), cell.getColumnIndex(), possibleValues));
-            }
-            sb.append("\n");
+            sb.append(debugPossibleValues(segmentType, segmentIndex));
         }
         return sb.toString();
     }
