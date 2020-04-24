@@ -1,9 +1,9 @@
-package io.stevenl.sudoku.solver;
+package io.stevenl.sudoku.core.solver;
 
-import io.stevenl.sudoku.SudokuException;
-import io.stevenl.sudoku.board.Board;
-import io.stevenl.sudoku.board.Cell;
-import io.stevenl.sudoku.board.SegmentType;
+import io.stevenl.sudoku.core.SudokuException;
+import io.stevenl.sudoku.core.board.Board;
+import io.stevenl.sudoku.core.board.Cell;
+import io.stevenl.sudoku.core.board.SegmentType;
 
 import java.util.HashMap;
 import java.util.HashSet;

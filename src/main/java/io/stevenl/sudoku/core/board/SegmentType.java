@@ -1,4 +1,4 @@
-package io.stevenl.sudoku.board;
+package io.stevenl.sudoku.core.board;
 
 import java.util.List;
 

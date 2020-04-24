@@ -1,4 +1,4 @@
-package io.stevenl.sudoku.solver;
+package io.stevenl.sudoku.core.solver;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

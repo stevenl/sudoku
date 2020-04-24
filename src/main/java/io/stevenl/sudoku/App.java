@@ -1,9 +1,10 @@
 package io.stevenl.sudoku;
 
-import io.stevenl.sudoku.board.Board;
-import io.stevenl.sudoku.board.SegmentType;
-import io.stevenl.sudoku.board.TextBoard;
-import io.stevenl.sudoku.solver.Solver;
+import io.stevenl.sudoku.core.SudokuException;
+import io.stevenl.sudoku.core.board.Board;
+import io.stevenl.sudoku.core.board.SegmentType;
+import io.stevenl.sudoku.core.board.TextBoard;
+import io.stevenl.sudoku.core.solver.Solver;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

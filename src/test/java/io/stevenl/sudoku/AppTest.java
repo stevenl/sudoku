@@ -1,7 +1,8 @@
 package io.stevenl.sudoku;
 
-import io.stevenl.sudoku.board.Board;
-import io.stevenl.sudoku.solver.Solver;
+import io.stevenl.sudoku.core.SudokuException;
+import io.stevenl.sudoku.core.board.Board;
+import io.stevenl.sudoku.core.solver.Solver;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
