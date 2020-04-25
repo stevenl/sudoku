@@ -1,14 +1,31 @@
 table.sudoku {
     border-collapse: collapse;
 }
+/* Mark the squares with thicker borders */
 .sudoku colgroup, tbody {
-    border: 2px solid black;
+    border: 3px solid black;
 }
 .sudoku td {
-    border: 1px solid gray;
+    border: 1px solid black;
+}
+.sudoku input {
     height: 40px;
     width: 40px;
     font-family: 'Kalam', cursive;
     font-size: 20px;
     text-align: center;
+    border: 0;
+    padding: 0;
+}
+
+/* Don't show the arrows in the number input box - it takes up too much space */
+/* Chrome, Safari, Edge, Opera */
+.sudoku input::-webkit-outer-spin-button,
+.sudoku input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
 }
