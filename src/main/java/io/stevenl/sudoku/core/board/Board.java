@@ -67,6 +67,14 @@ public class Board {
         return cells[index];
     }
 
+    public Cell[] getCells() {
+        return cells;
+    }
+
+    public Cell[][] getRows() {
+        return rows;
+    }
+
     public Cell[] getRow(int rowIndex) {
         return rows[rowIndex];
     }

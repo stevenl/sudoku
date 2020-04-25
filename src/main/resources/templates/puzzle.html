@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Sudoku Puzzle</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>Sudoku</h1>
+<table class="sudoku">
+<tr th:each="row : ${board.rows}">
+	<td th:each="cell : ${row}" th:text="${cell.value}" />
+</tr>
+</table>
+
+</body>
+</html>
