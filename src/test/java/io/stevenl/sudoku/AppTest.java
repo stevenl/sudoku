@@ -3,30 +3,15 @@ package io.stevenl.sudoku;
 import io.stevenl.sudoku.core.SudokuException;
 import io.stevenl.sudoku.core.board.Board;
 import io.stevenl.sudoku.core.solver.Solver;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest extends TestCase {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName ) {
-        super( testName );
-    }
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite() {
-        return new TestSuite( AppTest.class );
-    }
+@SpringBootTest
+public class AppTest {
 
+    @Test
     public void testBoardConstructionFromInput() throws SudokuException {
         String[][] tests = {
                 {"  7   9 8 3 17   4     6   69874 3    3 1 4    1 39762   4     9   51 4 4 5   1  ", "007000908030170004000006000698740300003010400001039762000400000900051040405000100"},
