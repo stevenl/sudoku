@@ -9,5 +9,4 @@ public class SudokuSolverApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SudokuSolverApplication.class, args);
 	}
-
 }

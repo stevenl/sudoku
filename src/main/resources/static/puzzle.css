@@ -1,0 +1,14 @@
+table.sudoku {
+    border-collapse: collapse;
+}
+.sudoku colgroup, tbody {
+    border: 2px solid black;
+}
+.sudoku td {
+    border: 1px solid gray;
+    height: 40px;
+    width: 40px;
+    font-family: 'Kalam', cursive;
+    font-size: 20px;
+    text-align: center;
+}
