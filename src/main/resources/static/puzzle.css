@@ -1,14 +1,37 @@
 table.sudoku {
     border-collapse: collapse;
 }
+
 /* Mark the regions with thicker borders */
-.sudoku colgroup, tbody {
+.sudoku .region {
     border: 3px solid black;
 }
+
+/* Headers */
+/* Hide the border in the header row and column */
+.sudoku th {
+    width: 25px;
+    font-weight: normal;
+    font-size: 14px;
+    color: gray;
+}
+.sudoku thead th {
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+}
+.sudoku tbody th {
+    border-top-style: hidden;
+    border-bottom-style: hidden;
+    border-left-style: hidden;
+}
+
+/* Cells */
 .sudoku td {
     border: 1px solid black;
+    padding: 0;
 }
-.sudoku input {
+.sudoku td input {
     height: 40px;
     width: 40px;
     font-family: 'Kalam', cursive;
@@ -17,7 +40,7 @@ table.sudoku {
     border: 0;
     padding: 0;
 }
-.sudoku input.solvable {
+.sudoku td input.solvable {
     background-color: #c4dfe6;
 }
 

@@ -11,14 +11,29 @@
 <h1>Sudoku</h1>
 
 <table class="sudoku">
-	<colgroup th:each="colGroup : ${#numbers.sequence(1, 3)}" ><col span="3"></colgroup>
+	<!--/* column groups to mark the regions */-->
+	<colgroup><col></colgroup>
+	<colgroup class="region" th:each="columns : ${board.regionColumns}">
+		<col th:span="${columns.length}">
+	</colgroup>
 
-	<colgroup th:each="columns : ${board.regionColumns}" ><col th:span="${columns.length}"></colgroup>
+	<!--/* header row */-->
+	<thead>
+		<tr>
+			<th scope="col"></th>
+			<th scope="col" th:each="column : ${board.columns}" th:text="${column.index + 1}" />
+		</tr>
+	</thead>
 
-	<tbody th:each="rows : ${board.regionRows}">
+	<!--/* row groups to mark the regions */-->
+	<tbody class="region" th:each="rows : ${board.regionRows}">
 		<tr th:each="row : ${rows}">
+			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}" />
 			<td th:each="cell : ${row.cells}">
-				<input type="number" min="1" max="9" th:value="${cell.value > 0 ? cell.value : ''}" th:readonly="${cell.value > 0}" th:classappend="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}">
+				<input type="number" min="1" max="9"
+					   th:value="${cell.value > 0 ? cell.value : ''}"
+					   th:readonly="${cell.value > 0}"
+					   th:class="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}" />
 			</td>
 		</tr>
 	</tbody>
