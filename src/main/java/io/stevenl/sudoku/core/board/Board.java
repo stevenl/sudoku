@@ -6,20 +6,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Board {
-    public static final int SIZE = 9;
-    public static final int NR_CELLS = SIZE * SIZE;
+    public static final int SIZE        = 9;
     public static final int REGION_SIZE = 3;
+    public static final int NR_CELLS    = SIZE * SIZE;
 
-    private Cell[] cells;
-    private Cell[][] rows;
-    private Cell[][] columns;
-    private Cell[][] regions;
+    private Cell[] cells      = new Cell[NR_CELLS];
+    private Segment[] rows    = new Segment[SIZE];
+    private Segment[] columns = new Segment[SIZE];
+    private Segment[] regions = new Segment[SIZE];
 
     public Board() {
-        cells   = new Cell[NR_CELLS];
-        rows    = new Cell[SIZE][SIZE];
-        columns = new Cell[SIZE][SIZE];
-        regions = new Cell[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            rows[i]    = new Segment(i);
+            columns[i] = new Segment(i);
+            regions[i] = new Segment(i);
+        }
 
         for (int i = 0; i < NR_CELLS; i++) {
             addCell(i);
@@ -58,9 +59,9 @@ public class Board {
         Cell cell = new Cell(index);
         cells[index] = cell;
 
-        rows[cell.getRowIndex()][cell.getColumnIndex()] = cell;
-        columns[cell.getColumnIndex()][cell.getRowIndex()] = cell;
-        regions[cell.getRegionIndex()][cell.getIndexInRegion()] = cell;
+        rows[cell.getRowIndex()].setCell(cell.getColumnIndex(), cell);
+        columns[cell.getColumnIndex()].setCell(cell.getRowIndex(), cell);
+        regions[cell.getRegionIndex()].setCell(cell.getIndexInRegion(), cell);
     }
 
     public Cell getCell(int index) {
@@ -71,38 +72,42 @@ public class Board {
         return cells;
     }
 
-    public Cell[][] getRows() {
+    public Segment[] getRows() {
         return rows;
     }
 
-    public Cell[] getRow(int rowIndex) {
+    public Segment[] getColumns() {
+        return columns;
+    }
+
+    public Segment getRow(int rowIndex) {
         return rows[rowIndex];
     }
 
-    public Cell[] getColumn(int colIndex) {
+    public Segment getColumn(int colIndex) {
         return columns[colIndex];
     }
 
-    public Cell[] getRegion(int regionIndex) {
+    public Segment getRegion(int regionIndex) {
         return regions[regionIndex];
     }
 
-    public Cell[] getSegment(SegmentType segmentType, int segmentIndex) {
-        Cell[] segmentCells;
+    public Segment getSegment(SegmentType segmentType, int segmentIndex) {
+        Segment segment;
         switch (segmentType) {
             case ROW:
-                segmentCells = getRow(segmentIndex);
+                segment = getRow(segmentIndex);
                 break;
             case COLUMN:
-                segmentCells = getColumn(segmentIndex);
+                segment = getColumn(segmentIndex);
                 break;
             case REGION:
-                segmentCells = getRegion(segmentIndex);
+                segment = getRegion(segmentIndex);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + segmentType);
         }
-        return segmentCells;
+        return segment;
     }
 
     @Override

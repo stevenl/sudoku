@@ -16,7 +16,7 @@
 	<th:block th:with="rows = ${board.rows}">
 		<tbody th:each="rowGroup : ${#numbers.sequence(0, 2)}">
 			<tr th:each="i : ${#numbers.sequence(0, 2)}" th:with="row = ${rows[rowGroup * 3 + i]}">
-				<td th:each="cell : ${row}">
+				<td th:each="cell : ${row.cells}">
 					<input type="number" min="1" max="9" th:value="${cell.value > 0 ? cell.value : ''}" th:readonly="${cell.value > 0}" th:classappend="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}">
 				</td>
 			</tr>

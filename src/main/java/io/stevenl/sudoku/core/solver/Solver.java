@@ -3,6 +3,7 @@ package io.stevenl.sudoku.core.solver;
 import io.stevenl.sudoku.core.SudokuException;
 import io.stevenl.sudoku.core.board.Board;
 import io.stevenl.sudoku.core.board.Cell;
+import io.stevenl.sudoku.core.board.Segment;
 import io.stevenl.sudoku.core.board.SegmentType;
 
 import java.util.HashMap;
@@ -66,13 +67,13 @@ public class Solver {
     private void removePossibleValueForAffectedCells(Cell cell) {
         int value = cell.getValue();
 
-        Cell[][] affectedSegments = {
+        Segment[] affectedSegments = {
                 board.getRow(cell.getRowIndex()),
                 board.getColumn(cell.getColumnIndex()),
                 board.getRegion(cell.getRegionIndex())
         };
-        for (Cell[] segment : affectedSegments) {
-            for (Cell affectedCell : segment) {
+        for (Segment segment : affectedSegments) {
+            for (Cell affectedCell : segment.getCells()) {
                 if (affectedCell.getValue() > 0) {
                     // No need to update cells that have already been solved
                     continue;
@@ -134,7 +135,7 @@ public class Solver {
     private Cell nextHintSolePossibilityWithinSegment() {
         for (SegmentType segmentType : SegmentType.SEGMENT_TYPES) {
             for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
-                Cell[] segment = board.getSegment(segmentType, segmentIndex);
+                Segment segment = board.getSegment(segmentType, segmentIndex);
                 Cell hint = nextHintHard(segment);
                 if (hint != null) {
                     return hint;
@@ -144,7 +145,7 @@ public class Solver {
         return null;
     }
 
-    private Cell nextHintSolePossibilityWithinSegment(Cell[] segment) {
+    private Cell nextHintSolePossibilityWithinSegment(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
         // Find where a value is possible only in one cell within a segment (e.g. row, column or region)
@@ -160,7 +161,7 @@ public class Solver {
         return null;
     }
 
-    public Cell nextHintHard(Cell[] segment) {
+    public Cell nextHintHard(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
         // Find the value combinations that have number of possible cells matching the number of values in the
@@ -217,10 +218,10 @@ public class Solver {
         return null;
     }
 
-    private Map<Integer, Set<Integer>> getPossibleCellsPerValue(Cell[] segment) {
+    private Map<Integer, Set<Integer>> getPossibleCellsPerValue(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = new HashMap<>();
 
-        for (Cell cell : segment) {
+        for (Cell cell : segment.getCells()) {
             int index = cell.getIndex();
             Set<Integer> possibleValues = possibleValuesPerCell.get(index);
 
@@ -245,9 +246,9 @@ public class Solver {
 
     public String debugPossibleValues(SegmentType segmentType, int segmentIndex) {
         StringBuilder sb = new StringBuilder();
-        Cell[] cells = board.getSegment(segmentType, segmentIndex);
+        Segment segment = board.getSegment(segmentType, segmentIndex);
 
-        for (Cell cell : cells) {
+        for (Cell cell : segment.getCells()) {
             int index = cell.getIndex();
             Set<Integer> possibleValues = possibleValuesPerCell.get(index);
             sb.append(String.format("%s %d (%d, %d): %s%n", segmentType, segmentIndex,
