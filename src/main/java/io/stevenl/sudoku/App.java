@@ -25,7 +25,7 @@ public class App {
         } catch (Exception e) {
 
             logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues(SegmentType.COLUMN, 0));
-            logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues(SegmentType.SQUARE, 6));
+            logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues(SegmentType.REGION, 6));
             logger.log(Level.WARNING, "{0}", e);
         }
         logger.log(Level.INFO, "\n{0}", textBoard);

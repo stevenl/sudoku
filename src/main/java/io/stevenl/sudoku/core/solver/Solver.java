@@ -57,7 +57,7 @@ public class Solver {
         possibleValuesPerCell.get(index).clear();
 
         // We can remove this value from the possible values for the cells in
-        // the same row, column, and square.
+        // the same row, column, and region.
         removePossibleValueForAffectedCells(cell);
 
         //LOGGER.info(String.format("SET %d = %d (%d, %d) %s", index, value, cell.getRowIndex(), cell.getColumnIndex(), affectedCells));
@@ -69,7 +69,7 @@ public class Solver {
         Cell[][] affectedSegments = {
                 board.getRow(cell.getRowIndex()),
                 board.getColumn(cell.getColumnIndex()),
-                board.getSquare(cell.getSquareIndex())
+                board.getRegion(cell.getRegionIndex())
         };
         for (Cell[] segment : affectedSegments) {
             for (Cell affectedCell : segment) {
@@ -147,7 +147,7 @@ public class Solver {
     private Cell nextHintSolePossibilityWithinSegment(Cell[] segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
-        // Find where a value is possible only in one cell within a segment (e.g. row, column or square)
+        // Find where a value is possible only in one cell within a segment (e.g. row, column or region)
         for (Map.Entry<Integer, Set<Integer>> e : possibleCellsPerValue.entrySet()) {
             int value = e.getKey();
             Set<Integer> possibleCells = e.getValue();

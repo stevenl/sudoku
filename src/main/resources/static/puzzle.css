@@ -1,7 +1,7 @@
 table.sudoku {
     border-collapse: collapse;
 }
-/* Mark the squares with thicker borders */
+/* Mark the regions with thicker borders */
 .sudoku colgroup, tbody {
     border: 3px solid black;
 }

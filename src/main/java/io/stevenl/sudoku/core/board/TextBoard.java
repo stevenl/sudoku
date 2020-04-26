@@ -17,7 +17,7 @@ public class TextBoard {
 
         // Main body
         for (int row = 0; row < Board.SIZE; row++) {
-            if (row % Board.SQUARE_SIZE == 0 && row > 0) {
+            if (row % Board.REGION_SIZE == 0 && row > 0) {
                 appendHorizontalSeparator(sb);
             }
             appendRow(sb, row);
@@ -32,7 +32,7 @@ public class TextBoard {
     private void appendColumnLabels(StringBuilder sb) {
         sb.append("   ");
         for (int i = 0; i < Board.SIZE; i++) {
-            if (i % Board.SQUARE_SIZE == 0 && i > 0) {
+            if (i % Board.REGION_SIZE == 0 && i > 0) {
                 sb.append("  ");
             }
             sb.append(String.format(" %d", i));
@@ -45,7 +45,7 @@ public class TextBoard {
 
         for (int col = 0; col < Board.SIZE; col++) {
             // Square separator (vertical)
-            if (col % Board.SQUARE_SIZE == 0 && col > 0) {
+            if (col % Board.REGION_SIZE == 0 && col > 0) {
                 sb.append(" |");
             }
 
@@ -63,7 +63,7 @@ public class TextBoard {
     private void appendHorizontalSeparator(StringBuilder sb) {
         sb.append("   ");
         for (int k = 0; k < Board.SIZE; k++) {
-            if (k % Board.SQUARE_SIZE == 0 && k > 0) {
+            if (k % Board.REGION_SIZE == 0 && k > 0) {
                 sb.append("- ");
             }
             sb.append("--");

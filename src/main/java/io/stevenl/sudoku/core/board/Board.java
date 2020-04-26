@@ -8,18 +8,18 @@ import java.util.stream.Stream;
 public class Board {
     public static final int SIZE = 9;
     public static final int NR_CELLS = SIZE * SIZE;
-    public static final int SQUARE_SIZE = 3;
+    public static final int REGION_SIZE = 3;
 
     private Cell[] cells;
     private Cell[][] rows;
     private Cell[][] columns;
-    private Cell[][] squares;
+    private Cell[][] regions;
 
     public Board() {
         cells   = new Cell[NR_CELLS];
         rows    = new Cell[SIZE][SIZE];
         columns = new Cell[SIZE][SIZE];
-        squares = new Cell[SIZE][SIZE];
+        regions = new Cell[SIZE][SIZE];
 
         for (int i = 0; i < NR_CELLS; i++) {
             addCell(i);
@@ -60,7 +60,7 @@ public class Board {
 
         rows[cell.getRowIndex()][cell.getColumnIndex()] = cell;
         columns[cell.getColumnIndex()][cell.getRowIndex()] = cell;
-        squares[cell.getSquareIndex()][cell.getIndexInSquare()] = cell;
+        regions[cell.getRegionIndex()][cell.getIndexInRegion()] = cell;
     }
 
     public Cell getCell(int index) {
@@ -83,8 +83,8 @@ public class Board {
         return columns[colIndex];
     }
 
-    public Cell[] getSquare(int squareIndex) {
-        return squares[squareIndex];
+    public Cell[] getRegion(int regionIndex) {
+        return regions[regionIndex];
     }
 
     public Cell[] getSegment(SegmentType segmentType, int segmentIndex) {
@@ -96,8 +96,8 @@ public class Board {
             case COLUMN:
                 segmentCells = getColumn(segmentIndex);
                 break;
-            case SQUARE:
-                segmentCells = getSquare(segmentIndex);
+            case REGION:
+                segmentCells = getRegion(segmentIndex);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + segmentType);

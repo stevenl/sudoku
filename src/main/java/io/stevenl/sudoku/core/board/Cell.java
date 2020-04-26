@@ -13,8 +13,8 @@ public class Cell {
     private int index;
     private int rowIndex;
     private int columnIndex;
-    private int squareIndex;
-    private int indexInSquare;
+    private int regionIndex;
+    private int indexInRegion;
     private int value;
 
     public Cell(int index) {
@@ -26,13 +26,13 @@ public class Cell {
         this.rowIndex = index / Board.SIZE;
         this.columnIndex = index % Board.SIZE;
 
-        int squareRow = rowIndex / Board.SQUARE_SIZE;
-        int squareCol = columnIndex / Board.SQUARE_SIZE;
-        this.squareIndex = squareRow * Board.SQUARE_SIZE + squareCol;
+        int regionRow = rowIndex / Board.REGION_SIZE;
+        int regionCol = columnIndex / Board.REGION_SIZE;
+        this.regionIndex = regionRow * Board.REGION_SIZE + regionCol;
 
-        int rowInSquare = rowIndex - squareRow * Board.SQUARE_SIZE;
-        int columnInSquare = columnIndex - squareCol * Board.SQUARE_SIZE;
-        this.indexInSquare = rowInSquare * Board.SQUARE_SIZE + columnInSquare;
+        int rowInRegion = rowIndex - regionRow * Board.REGION_SIZE;
+        int columnInSquare = columnIndex - regionCol * Board.REGION_SIZE;
+        this.indexInRegion = rowInRegion * Board.REGION_SIZE + columnInSquare;
     }
 
     public Cell(int index, int value) {
@@ -52,12 +52,12 @@ public class Cell {
         return columnIndex;
     }
 
-    public int getSquareIndex() {
-        return squareIndex;
+    public int getRegionIndex() {
+        return regionIndex;
     }
 
-    public int getIndexInSquare() {
-        return indexInSquare;
+    public int getIndexInRegion() {
+        return indexInRegion;
     }
 
     public void setValue(int value) {
