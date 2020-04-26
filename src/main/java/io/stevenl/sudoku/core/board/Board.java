@@ -14,6 +14,8 @@ public class Board {
     private Segment[] rows    = new Segment[SIZE];
     private Segment[] columns = new Segment[SIZE];
     private Segment[] regions = new Segment[SIZE];
+    private Segment[][] regionRows    = new Segment[REGION_SIZE][REGION_SIZE];
+    private Segment[][] regionColumns = new Segment[REGION_SIZE][REGION_SIZE];
 
     public Board() {
         for (int i = 0; i < SIZE; i++) {
@@ -24,6 +26,15 @@ public class Board {
 
         for (int i = 0; i < NR_CELLS; i++) {
             addCell(i);
+        }
+
+        int segmentIndex = 0;
+        for (int i = 0; i < REGION_SIZE; i++) {
+            for (int j = 0; j < REGION_SIZE; j++) {
+                regionRows[i][j] = rows[segmentIndex];
+                regionColumns[i][j] = columns[segmentIndex];
+                segmentIndex++;
+            }
         }
     }
 
@@ -108,6 +119,14 @@ public class Board {
                 throw new IllegalStateException("Unexpected value: " + segmentType);
         }
         return segment;
+    }
+
+    public Segment[][] getRegionRows() {
+        return regionRows;
+    }
+
+    public Segment[][] getRegionColumns() {
+        return regionColumns;
     }
 
     @Override
