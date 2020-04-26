@@ -3,8 +3,8 @@
 <head>
 	<title>Sudoku Puzzle</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap">
-	<link rel="stylesheet" type="text/css" href="/puzzle.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap" />
+	<link rel="stylesheet" type="text/css" href="/puzzle.css" />
 </head>
 <body>
 
@@ -17,7 +17,7 @@
 		<tbody th:each="rowGroup : ${#numbers.sequence(0, 2)}">
 			<tr th:each="i : ${#numbers.sequence(0, 2)}" th:with="row = ${rows[rowGroup * 3 + i]}">
 				<td th:each="cell : ${row}">
-					<input type="number" min="1" max="9" th:value="${cell.value > 0 ? cell.value : ''}" th:readonly="${cell.value > 0}">
+					<input type="number" min="1" max="9" th:value="${cell.value > 0 ? cell.value : ''}" th:readonly="${cell.value > 0}" th:classappend="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}">
 				</td>
 			</tr>
 		</tbody>

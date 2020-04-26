@@ -17,7 +17,7 @@ public class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
 
     private Board board;
-    private Set<Integer> solvable;
+    private Set<Integer> solvableCells;
     private Set<Integer> unsolvedCells;
     private Map<Integer, Set<Integer>> possibleValuesPerCell;
 
@@ -25,7 +25,7 @@ public class Solver {
         this.board = board;
 
         // Initialise for an empty board
-        solvable = new HashSet<>(Board.NR_CELLS);
+        solvableCells = new HashSet<>(Board.NR_CELLS);
         unsolvedCells = new HashSet<>(Board.NR_CELLS);
         possibleValuesPerCell = new HashMap<>(Board.NR_CELLS);
         for (int index = 0; index < Board.NR_CELLS; index++) {
@@ -44,11 +44,15 @@ public class Solver {
         }
     }
 
+    public Set<Integer> getSolvableCells() {
+        return solvableCells;
+    }
+
     private void setCellValue(int index, int value) {
         Cell cell = board.getCell(index);
         cell.setValue(value);
 
-        solvable.remove(index);
+        solvableCells.remove(index);
         unsolvedCells.remove(index);
         possibleValuesPerCell.get(index).clear();
 
@@ -87,7 +91,7 @@ public class Solver {
 
             // We can mark the cell as solvable if it only has 1 remaining possible value
             if (possibleValues.size() == 1) {
-                solvable.add(index);
+                solvableCells.add(index);
             }
         }
     }
@@ -113,8 +117,8 @@ public class Solver {
     }
 
     private Cell nextHintSolePossibility() {
-        if (!solvable.isEmpty()) {
-            int index = solvable.iterator().next();
+        if (!solvableCells.isEmpty()) {
+            int index = solvableCells.iterator().next();
 
             Set<Integer> possibleValues = possibleValuesPerCell.get(index);
             if (possibleValues.size() != 1) {

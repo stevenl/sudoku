@@ -17,6 +17,9 @@ table.sudoku {
     border: 0;
     padding: 0;
 }
+.sudoku input.solvable {
+    background-color: #c4dfe6;
+}
 
 /* Don't show the arrows in the number input box - it takes up too much space */
 /* Chrome, Safari, Edge, Opera */
