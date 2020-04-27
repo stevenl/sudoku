@@ -133,7 +133,7 @@ public class Board {
     public String toString() {
         return Stream.of(cells)
                 .map(Cell::getValue)
-                .map(v -> Character.forDigit(v, 10))
+                .map(v -> v != null ? Character.forDigit(v, 10) : '0')
                 .map(String::valueOf)
                 .collect(Collectors.joining());
     }

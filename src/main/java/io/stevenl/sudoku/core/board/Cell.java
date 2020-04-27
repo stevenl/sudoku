@@ -15,7 +15,10 @@ public class Cell {
     private int columnIndex;
     private int regionIndex;
     private int indexInRegion;
-    private int value;
+
+    // Use Integer instead of int so we can have null values instead of 0
+    // which will also get displayed as blank in html
+    private Integer value;
 
     public Cell(int index) {
         if (index < 0 || index >= Board.NR_CELLS) {
@@ -35,9 +38,9 @@ public class Cell {
         this.indexInRegion = rowInRegion * Board.REGION_SIZE + columnInSquare;
     }
 
-    public Cell(int index, int value) {
+    public Cell(int index, Integer value) {
         this(index);
-        this.value = value;
+        setValue(value);
     }
 
     public int getIndex() {
@@ -60,14 +63,14 @@ public class Cell {
         return indexInRegion;
     }
 
-    public void setValue(int value) {
+    public Integer getValue() {
+        return value;
+    }
+
+    public void setValue(Integer value) {
         if (value < 1 || value > 9) {
             throw new IllegalArgumentException("Invalid cell value: " + value);
         }
         this.value = value;
-    }
-
-    public int getValue() {
-        return value;
     }
 }

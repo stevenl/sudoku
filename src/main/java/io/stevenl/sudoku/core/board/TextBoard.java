@@ -50,9 +50,9 @@ public class TextBoard {
             }
 
             int index = row * Board.SIZE + col;
-            int value = board.getCell(index).getValue();
+            Integer value = board.getCell(index).getValue();
 
-            String valStr = value > 0
+            String valStr = value != null
                     ? String.valueOf(value)
                     : " ";
             sb.append(String.format(" %s", valStr));

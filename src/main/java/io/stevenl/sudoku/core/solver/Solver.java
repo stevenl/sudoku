@@ -37,9 +37,9 @@ public class Solver {
         // Add the cells that have already been set
         for (int index = 0; index < Board.NR_CELLS; index++) {
             Cell cell = board.getCell(index);
-            int value = cell.getValue();
+            Integer value = cell.getValue();
 
-            if (value > 0) {
+            if (value != null) {
                 setCellValue(index, value);
             }
         }
@@ -65,7 +65,7 @@ public class Solver {
     }
 
     private void removePossibleValueForAffectedCells(Cell cell) {
-        int value = cell.getValue();
+        Integer value = cell.getValue();
 
         Segment[] affectedSegments = {
                 board.getRow(cell.getRowIndex()),
@@ -74,7 +74,7 @@ public class Solver {
         };
         for (Segment segment : affectedSegments) {
             for (Cell affectedCell : segment.getCells()) {
-                if (affectedCell.getValue() > 0) {
+                if (affectedCell.getValue() != null) {
                     // No need to update cells that have already been solved
                     continue;
                 }

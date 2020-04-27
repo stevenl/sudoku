@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
 	<title>Sudoku Puzzle</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -31,7 +31,7 @@
 			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}" />
 			<td th:each="cell : ${row.cells}">
 				<input type="number" min="1" max="9"
-					   th:value="${cell.value > 0 ? cell.value : ''}"
+					   th:value="${cell.value}"
 					   th:readonly="${cell.value > 0}"
 					   th:class="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}" />
 			</td>

@@ -16,7 +16,7 @@ public class App {
         Board board = new Board("000000080005073090000900300000200709900136004403009000001005000060840900070000000"); // evil
 
         TextBoard textBoard = new TextBoard(board);
-        logger.log(Level.INFO, "\n{0}", textBoard);
+        logger.log(Level.INFO, "Start\n{0}", textBoard);
         logger.log(Level.INFO, "{0}", board);
 
         Solver solver = new Solver(board);
@@ -28,7 +28,7 @@ public class App {
             logger.log(Level.WARNING, "\n{0}", solver.debugPossibleValues(SegmentType.REGION, 6));
             logger.log(Level.WARNING, "{0}", e);
         }
-        logger.log(Level.INFO, "\n{0}", textBoard);
+        logger.log(Level.INFO, "Solved\n{0}", textBoard);
         logger.log(Level.INFO, "{0}", board);
     }
 }
