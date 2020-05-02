@@ -68,7 +68,7 @@ public class Cell {
     }
 
     public void setValue(Integer value) {
-        if (value < 1 || value > 9) {
+        if (value != null && (value < 1 || value > 9)) {
             throw new IllegalArgumentException("Invalid cell value: " + value);
         }
         this.value = value;

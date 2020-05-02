@@ -10,34 +10,38 @@
 
 <h1>Sudoku</h1>
 
-<table class="sudoku">
-	<!--/* column groups to mark the regions */-->
-	<colgroup><col></colgroup>
-	<colgroup class="region" th:each="columns : ${board.regionColumns}">
-		<col th:span="${columns.length}">
-	</colgroup>
+<form action="#" th:action="@{/puzzles}" method="post">
+	<table class="sudoku">
+		<!--/* column groups to mark the regions */-->
+		<colgroup><col></colgroup>
+		<colgroup class="region" th:each="columns : ${board.regionColumns}">
+			<col th:span="${columns.length}">
+		</colgroup>
 
-	<!--/* header row */-->
-	<thead>
-		<tr>
-			<th scope="col"></th>
-			<th scope="col" th:each="column : ${board.columns}" th:text="${column.index + 1}" />
-		</tr>
-	</thead>
+		<!--/* header row */-->
+		<thead>
+			<tr>
+				<th scope="col"></th>
+				<th scope="col" th:each="column : ${board.columns}" th:text="${column.index + 1}" />
+			</tr>
+		</thead>
 
-	<!--/* row groups to mark the regions */-->
-	<tbody class="region" th:each="rows : ${board.regionRows}">
-		<tr th:each="row : ${rows}">
-			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}" />
-			<td th:each="cell : ${row.cells}">
-				<input type="number" min="1" max="9"
-					   th:value="${cell.value}"
-					   th:readonly="${cell.value > 0}"
-					   th:class="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}" />
-			</td>
-		</tr>
-	</tbody>
-</table>
+		<!--/* row groups to mark the regions */-->
+		<tbody class="region" th:each="rows : ${board.regionRows}">
+			<tr th:each="row : ${rows}">
+				<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}" />
+				<td th:each="cell : ${row.cells}" th:object="${board.cells[__${cell.index}__]}">
+					<input type="number" min="1" max="9"
+						   th:readonly="${cell.value > 0}"
+						   th:class="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}"
+						   th:field="*{value}"
+					/>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
+	<input type="submit" value="Update" />
+</form>
 </body>
 </html>
