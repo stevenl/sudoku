@@ -1,4 +1,4 @@
-package io.stevenl.sudoku.core.board;
+package io.stevenl.sudoku.core.grid;
 
 import java.util.List;
 

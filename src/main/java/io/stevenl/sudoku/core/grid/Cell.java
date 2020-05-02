@@ -1,4 +1,4 @@
-package io.stevenl.sudoku.core.board;
+package io.stevenl.sudoku.core.grid;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,21 +21,21 @@ public class Cell {
     private Integer value;
 
     public Cell(int index) {
-        if (index < 0 || index >= Board.NR_CELLS) {
+        if (index < 0 || index >= Grid.NR_CELLS) {
             throw new IllegalArgumentException("Invalid cell index: " + index);
         }
 
         this.index = index;
-        this.rowIndex = index / Board.SIZE;
-        this.columnIndex = index % Board.SIZE;
+        this.rowIndex = index / Grid.SIZE;
+        this.columnIndex = index % Grid.SIZE;
 
-        int regionRow = rowIndex / Board.REGION_SIZE;
-        int regionCol = columnIndex / Board.REGION_SIZE;
-        this.regionIndex = regionRow * Board.REGION_SIZE + regionCol;
+        int regionRow = rowIndex / Grid.REGION_SIZE;
+        int regionCol = columnIndex / Grid.REGION_SIZE;
+        this.regionIndex = regionRow * Grid.REGION_SIZE + regionCol;
 
-        int rowInRegion = rowIndex - regionRow * Board.REGION_SIZE;
-        int columnInSquare = columnIndex - regionCol * Board.REGION_SIZE;
-        this.indexInRegion = rowInRegion * Board.REGION_SIZE + columnInSquare;
+        int rowInRegion = rowIndex - regionRow * Grid.REGION_SIZE;
+        int columnInSquare = columnIndex - regionCol * Grid.REGION_SIZE;
+        this.indexInRegion = rowInRegion * Grid.REGION_SIZE + columnInSquare;
     }
 
     public Cell(int index, Integer value) {

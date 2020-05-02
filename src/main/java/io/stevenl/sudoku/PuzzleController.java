@@ -1,7 +1,7 @@
 package io.stevenl.sudoku;
 
 import io.stevenl.sudoku.core.SudokuException;
-import io.stevenl.sudoku.core.board.Board;
+import io.stevenl.sudoku.core.grid.Grid;
 import io.stevenl.sudoku.core.solver.Solver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,10 @@ public class PuzzleController {
 
     @GetMapping("/puzzles")
     public String getPuzzle(Model model) throws SudokuException {
-        Board board = new Board("000000080005073090000900300000200709900136004403009000001005000060840900070000000");
-        model.addAttribute("board", board);
+        Grid grid = new Grid("000000080005073090000900300000200709900136004403009000001005000060840900070000000");
+        model.addAttribute("grid", grid);
 
-        Solver solver = new Solver(board);
+        Solver solver = new Solver(grid);
         model.addAttribute("solvableCells", solver.getSolvableCells());
         LOGGER.info("solvable = {}", solver.getSolvableCells());
 
@@ -28,9 +28,9 @@ public class PuzzleController {
     }
 
     @PostMapping("/puzzles")
-    public String updatePuzzle(@ModelAttribute Board board, Model model) {
-        LOGGER.info("puzzle = {}", board);
-        Solver solver = new Solver(board);
+    public String updatePuzzle(@ModelAttribute Grid grid, Model model) {
+        LOGGER.info("puzzle = {}", grid);
+        Solver solver = new Solver(grid);
         model.addAttribute("solvableCells", solver.getSolvableCells());
 
         return "puzzle";

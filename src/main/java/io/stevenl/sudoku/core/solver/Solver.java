@@ -1,10 +1,10 @@
 package io.stevenl.sudoku.core.solver;
 
 import io.stevenl.sudoku.core.SudokuException;
-import io.stevenl.sudoku.core.board.Board;
-import io.stevenl.sudoku.core.board.Cell;
-import io.stevenl.sudoku.core.board.Segment;
-import io.stevenl.sudoku.core.board.SegmentType;
+import io.stevenl.sudoku.core.grid.Grid;
+import io.stevenl.sudoku.core.grid.Cell;
+import io.stevenl.sudoku.core.grid.Segment;
+import io.stevenl.sudoku.core.grid.SegmentType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,26 +17,26 @@ import java.util.stream.Collectors;
 public class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
 
-    private Board board;
+    private Grid grid;
     private Set<Integer> solvableCells;
     private Set<Integer> unsolvedCells;
     private Map<Integer, Set<Integer>> possibleValuesPerCell;
 
-    public Solver(Board board) {
-        this.board = board;
+    public Solver(Grid grid) {
+        this.grid = grid;
 
-        // Initialise for an empty board
-        solvableCells = new HashSet<>(Board.NR_CELLS);
-        unsolvedCells = new HashSet<>(Board.NR_CELLS);
-        possibleValuesPerCell = new HashMap<>(Board.NR_CELLS);
-        for (int index = 0; index < Board.NR_CELLS; index++) {
+        // Initialise for an empty grid
+        solvableCells = new HashSet<>(Grid.NR_CELLS);
+        unsolvedCells = new HashSet<>(Grid.NR_CELLS);
+        possibleValuesPerCell = new HashMap<>(Grid.NR_CELLS);
+        for (int index = 0; index < Grid.NR_CELLS; index++) {
             unsolvedCells.add(index);
             possibleValuesPerCell.put(index, new HashSet<>(Cell.POSSIBLE_VALUES));
         }
 
         // Add the cells that have already been set
-        for (int index = 0; index < Board.NR_CELLS; index++) {
-            Cell cell = board.getCell(index);
+        for (int index = 0; index < Grid.NR_CELLS; index++) {
+            Cell cell = grid.getCell(index);
             Integer value = cell.getValue();
 
             if (value != null) {
@@ -50,7 +50,7 @@ public class Solver {
     }
 
     private void setCellValue(int index, int value) {
-        Cell cell = board.getCell(index);
+        Cell cell = grid.getCell(index);
         cell.setValue(value);
 
         solvableCells.remove(index);
@@ -68,9 +68,9 @@ public class Solver {
         Integer value = cell.getValue();
 
         Segment[] affectedSegments = {
-                board.getRow(cell.getRowIndex()),
-                board.getColumn(cell.getColumnIndex()),
-                board.getRegion(cell.getRegionIndex())
+                grid.getRow(cell.getRowIndex()),
+                grid.getColumn(cell.getColumnIndex()),
+                grid.getRegion(cell.getRegionIndex())
         };
         for (Segment segment : affectedSegments) {
             for (Cell affectedCell : segment.getCells()) {
@@ -134,8 +134,8 @@ public class Solver {
 
     private Cell nextHintSolePossibilityWithinSegment() {
         for (SegmentType segmentType : SegmentType.SEGMENT_TYPES) {
-            for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
-                Segment segment = board.getSegment(segmentType, segmentIndex);
+            for (int segmentIndex = 0; segmentIndex < Grid.SIZE; segmentIndex++) {
+                Segment segment = grid.getSegment(segmentType, segmentIndex);
                 Cell hint = nextHintHard(segment);
                 if (hint != null) {
                     return hint;
@@ -238,7 +238,7 @@ public class Solver {
 
     public String debugPossibleValues(SegmentType segmentType) {
         StringBuilder sb = new StringBuilder();
-        for (int segmentIndex = 0; segmentIndex < Board.SIZE; segmentIndex++) {
+        for (int segmentIndex = 0; segmentIndex < Grid.SIZE; segmentIndex++) {
             sb.append(debugPossibleValues(segmentType, segmentIndex));
         }
         return sb.toString();
@@ -246,7 +246,7 @@ public class Solver {
 
     public String debugPossibleValues(SegmentType segmentType, int segmentIndex) {
         StringBuilder sb = new StringBuilder();
-        Segment segment = board.getSegment(segmentType, segmentIndex);
+        Segment segment = grid.getSegment(segmentType, segmentIndex);
 
         for (Cell cell : segment.getCells()) {
             int index = cell.getIndex();

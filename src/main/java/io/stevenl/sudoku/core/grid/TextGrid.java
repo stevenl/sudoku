@@ -1,10 +1,10 @@
-package io.stevenl.sudoku.core.board;
+package io.stevenl.sudoku.core.grid;
 
-public class TextBoard {
-    private Board board;
+public class TextGrid {
+    private Grid grid;
 
-    public TextBoard(Board board) {
-        this.board = board;
+    public TextGrid(Grid grid) {
+        this.grid = grid;
     }
 
     @Override
@@ -16,8 +16,8 @@ public class TextBoard {
         appendHorizontalSeparator(sb);
 
         // Main body
-        for (int row = 0; row < Board.SIZE; row++) {
-            if (row % Board.REGION_SIZE == 0 && row > 0) {
+        for (int row = 0; row < Grid.SIZE; row++) {
+            if (row % Grid.REGION_SIZE == 0 && row > 0) {
                 appendHorizontalSeparator(sb);
             }
             appendRow(sb, row);
@@ -31,8 +31,8 @@ public class TextBoard {
 
     private void appendColumnLabels(StringBuilder sb) {
         sb.append("   ");
-        for (int i = 0; i < Board.SIZE; i++) {
-            if (i % Board.REGION_SIZE == 0 && i > 0) {
+        for (int i = 0; i < Grid.SIZE; i++) {
+            if (i % Grid.REGION_SIZE == 0 && i > 0) {
                 sb.append("  ");
             }
             sb.append(String.format(" %d", i));
@@ -43,14 +43,14 @@ public class TextBoard {
     private void appendRow(StringBuilder sb, int row) {
         sb.append(String.format("%d |", row));
 
-        for (int col = 0; col < Board.SIZE; col++) {
+        for (int col = 0; col < Grid.SIZE; col++) {
             // Square separator (vertical)
-            if (col % Board.REGION_SIZE == 0 && col > 0) {
+            if (col % Grid.REGION_SIZE == 0 && col > 0) {
                 sb.append(" |");
             }
 
-            int index = row * Board.SIZE + col;
-            Integer value = board.getCell(index).getValue();
+            int index = row * Grid.SIZE + col;
+            Integer value = grid.getCell(index).getValue();
 
             String valStr = value != null
                     ? String.valueOf(value)
@@ -62,8 +62,8 @@ public class TextBoard {
 
     private void appendHorizontalSeparator(StringBuilder sb) {
         sb.append("   ");
-        for (int k = 0; k < Board.SIZE; k++) {
-            if (k % Board.REGION_SIZE == 0 && k > 0) {
+        for (int k = 0; k < Grid.SIZE; k++) {
+            if (k % Grid.REGION_SIZE == 0 && k > 0) {
                 sb.append("- ");
             }
             sb.append("--");

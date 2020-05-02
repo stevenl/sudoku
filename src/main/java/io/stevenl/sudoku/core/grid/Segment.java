@@ -1,4 +1,4 @@
-package io.stevenl.sudoku.core.board;
+package io.stevenl.sudoku.core.grid;
 
 public class Segment {
     private int index;
@@ -6,7 +6,7 @@ public class Segment {
 
     public Segment(int index) {
         this.index = index;
-        this.cells = new Cell[Board.SIZE];
+        this.cells = new Cell[Grid.SIZE];
     }
 
     public int getIndex() {

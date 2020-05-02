@@ -1,7 +1,7 @@
 package io.stevenl.sudoku;
 
 import io.stevenl.sudoku.core.SudokuException;
-import io.stevenl.sudoku.core.board.Board;
+import io.stevenl.sudoku.core.grid.Grid;
 import io.stevenl.sudoku.core.solver.Solver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +18,8 @@ public class AppTest {
                 {"  7   9 8\n 3 17   4\n     6   \n69874 3  \n  3 1 4  \n  1 39762\n   4     \n9   51 4 \n4 5   1  ", "007000908030170004000006000698740300003010400001039762000400000900051040405000100"}
         };
         for (String[] test : tests) {
-            Board board = new Board(test[0]);
-            assertEquals(board.toString(), test[1]);
+            Grid grid = new Grid(test[0]);
+            assertEquals(grid.toString(), test[1]);
         }
     }
 
@@ -31,10 +31,10 @@ public class AppTest {
                 {"000000080005073090000900300000200709900136004403009000001005000060840900070000000", "739562481185473296246918375618254739927136854453789162891325647562847913374691528"}  // evil
         };
         for (String[] test : tests) {
-            Board board = new Board(test[0]);
-            Solver solver = new Solver(board);
+            Grid grid = new Grid(test[0]);
+            Solver solver = new Solver(grid);
             solver.solve();
-            assertEquals(board.toString(), test[1]);
+            assertEquals(grid.toString(), test[1]);
         }
     }
 }

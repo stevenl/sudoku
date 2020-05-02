@@ -1,11 +1,11 @@
-package io.stevenl.sudoku.core.board;
+package io.stevenl.sudoku.core.grid;
 
 import io.stevenl.sudoku.core.SudokuException;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Board {
+public class Grid {
     public static final int SIZE        = 9;
     public static final int REGION_SIZE = 3;
     public static final int NR_CELLS    = SIZE * SIZE;
@@ -17,7 +17,7 @@ public class Board {
     private Segment[][] regionRows    = new Segment[REGION_SIZE][REGION_SIZE];
     private Segment[][] regionColumns = new Segment[REGION_SIZE][REGION_SIZE];
 
-    public Board() {
+    public Grid() {
         for (int i = 0; i < SIZE; i++) {
             rows[i]    = new Segment(i);
             columns[i] = new Segment(i);
@@ -38,7 +38,7 @@ public class Board {
         }
     }
 
-    public Board(String input) throws SudokuException {
+    public Grid(String input) throws SudokuException {
         this();
 
         int[] values = input.chars()

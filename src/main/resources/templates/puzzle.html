@@ -14,7 +14,7 @@
 	<table class="sudoku">
 		<!--/* column groups to mark the regions */-->
 		<colgroup><col></colgroup>
-		<colgroup class="region" th:each="columns : ${board.regionColumns}">
+		<colgroup class="region" th:each="columns : ${grid.regionColumns}">
 			<col th:span="${columns.length}">
 		</colgroup>
 
@@ -22,15 +22,15 @@
 		<thead>
 			<tr>
 				<th scope="col"></th>
-				<th scope="col" th:each="column : ${board.columns}" th:text="${column.index + 1}" />
+				<th scope="col" th:each="column : ${grid.columns}" th:text="${column.index + 1}" />
 			</tr>
 		</thead>
 
 		<!--/* row groups to mark the regions */-->
-		<tbody class="region" th:each="rows : ${board.regionRows}">
+		<tbody class="region" th:each="rows : ${grid.regionRows}">
 			<tr th:each="row : ${rows}">
 				<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}" />
-				<td th:each="cell : ${row.cells}" th:object="${board.cells[__${cell.index}__]}">
+				<td th:each="cell : ${row.cells}" th:object="${grid.cells[__${cell.index}__]}">
 					<input type="number" min="1" max="9"
 						   th:readonly="${cell.value > 0}"
 						   th:class="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}"
