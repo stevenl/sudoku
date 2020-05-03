@@ -11,16 +11,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Solver {
-    private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
-
-    private Grid grid;
-    private Set<Integer> solvableCells;
-    private Set<Integer> unsolvedCells;
-    private Map<Integer, Set<Integer>> possibleValuesPerCell;
+    private final Grid grid;
+    private final Set<Integer> solvableCells;
+    private final Set<Integer> unsolvedCells;
+    private final Map<Integer, Set<Integer>> possibleValuesPerCell;
 
     public Solver(Grid grid) {
         this.grid = grid;
@@ -43,6 +40,8 @@ public class Solver {
                 setCellValue(index, value);
             }
         }
+
+        optimisePossibleValues();
     }
 
     public Set<Integer> getSolvableCells() {
@@ -64,8 +63,6 @@ public class Solver {
         // We can remove this value from the possible values for the cells in
         // the same row, column, and region.
         removePossibleValueForAffectedCells(cell);
-
-        //LOGGER.info(String.format("SET %d = %d (%d, %d) %s", index, value, cell.getRowIndex(), cell.getColumnIndex(), affectedCells));
     }
 
     private void removePossibleValueForAffectedCells(Cell cell) {
@@ -101,55 +98,15 @@ public class Solver {
         }
     }
 
-    public void solve() throws SudokuException {
-        while (!unsolvedCells.isEmpty()) {
-            Cell hint = nextHintSolePossibility();
-            if (hint != null) {
-                setCellValue(hint.getIndex(), hint.getValue());
-                continue;
-            }
-
-            hint = nextHintSolePossibilityWithinSegment();
-            if (hint != null) {
-                setCellValue(hint.getIndex(), hint.getValue());
-                continue;
-            }
-
-            if (!unsolvedCells.isEmpty()) {
-                throw new SudokuException(String.format("Couldn't solve it. There are still %d unsolved cells", unsolvedCells.size()));
-            }
-        }
-    }
-
-    private Cell nextHintSolePossibility() {
-        if (!solvableCells.isEmpty()) {
-            int index = solvableCells.iterator().next();
-
-            Set<Integer> possibleValues = possibleValuesPerCell.get(index);
-            if (possibleValues.size() != 1) {
-                throw new AssertionError("Solvable cell has no solution");
-            }
-            int value = possibleValues.iterator().next();
-
-            return new Cell(index, value);
-        }
-        return null;
-    }
-
-    private Cell nextHintSolePossibilityWithinSegment() {
+    public void optimisePossibleValues() {
         for (SegmentType segmentType : SegmentType.SEGMENT_TYPES) {
-            for (int segmentIndex = 0; segmentIndex < Grid.SIZE; segmentIndex++) {
-                Segment segment = grid.getSegment(segmentType, segmentIndex);
-                Cell hint = nextHintHard(segment);
-                if (hint != null) {
-                    return hint;
-                }
+            for (Segment segment : grid.getSegments(segmentType)) {
+                optimisePossibleValues(segment);
             }
         }
-        return null;
     }
 
-    private Cell nextHintSolePossibilityWithinSegment(Segment segment) {
+    /*private Cell nextHintSolePossibilityWithinSegment(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
         // Find where a value is possible only in one cell within a segment (e.g. row, column or region)
@@ -163,9 +120,9 @@ public class Solver {
             }
         }
         return null;
-    }
+    }*/
 
-    public Cell nextHintHard(Segment segment) {
+    private void optimisePossibleValues(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
         // Find the value combinations that have number of possible cells matching the number of values in the
@@ -178,7 +135,6 @@ public class Solver {
         Map<Integer, List<Integer>> nrPossibleCells2Values = possibleCellsPerValue
                 .keySet().stream().collect(
                         Collectors.groupingBy(v -> possibleCellsPerValue.get(v).size()));
-        //LOGGER.info("HERE = " + nrPossibleCells2Values.toString());
 
         // nrPossibleCells => combinations of values with that number of cells
         Map<Integer, List<List<Integer>>> nrPossibleCells2ValueCombinations = nrPossibleCells2Values
@@ -188,9 +144,7 @@ public class Solver {
                     List<Integer> values = e.getValue();
                     return Combinations.combinations(values, nrPossibleCells);
                 }));
-        //LOGGER.info("COMBOS = " + nrPossibleCells2ValueCombinations);
 
-        //
         for (Map.Entry<Integer, List<List<Integer>>> e : nrPossibleCells2ValueCombinations.entrySet()) {
             int nrPossibleCells = e.getKey();
             List<List<Integer>> valueCombinations = e.getValue();
@@ -205,21 +159,16 @@ public class Solver {
                         })
                         .orElse(Set.of());
                 if (possibleCellsCombined.size() == nrPossibleCells) {
-                    for (int cell : possibleCellsCombined) {
-                        Set<Integer> possibleValues = possibleValuesPerCell.get(cell);
-                        possibleValues.retainAll(valueCombo);
-                    }
-
-                    // Special case: This can be solved
-                    if (nrPossibleCells == 1) {
-                        int index = possibleCellsCombined.iterator().next();
-                        int value = possibleValuesPerCell.get(index).iterator().next();
-                        return new Cell(index, value);
+                    for (int cellIndex : possibleCellsCombined) {
+                        Set<Integer> possibleValues = possibleValuesPerCell.get(cellIndex);
+                        Set<Integer> toRemove = possibleValues.stream()
+                                .filter(v -> !valueCombo.contains(v))
+                                .collect(Collectors.toSet());
+                        toRemove.forEach(v -> removePossibleValue(cellIndex, v));
                     }
                 }
             }
         }
-        return null;
     }
 
     private Map<Integer, Set<Integer>> getPossibleCellsPerValue(Segment segment) {
@@ -238,6 +187,33 @@ public class Solver {
             }
         }
         return possibleCellsPerValue;
+    }
+
+    public void solve() throws SudokuException {
+        while (!unsolvedCells.isEmpty()) {
+            Cell hint = nextHint();
+            setCellValue(hint.getIndex(), hint.getValue());
+        }
+    }
+
+    private Cell nextHint() throws SudokuException {
+        if (solvableCells.isEmpty()) {
+            optimisePossibleValues();
+
+            if (solvableCells.isEmpty()) {
+                throw new SudokuException(String.format(
+                        "Couldn't solve it. There are still %d unsolved cells", unsolvedCells.size()));
+            }
+        }
+
+        int index = solvableCells.iterator().next();
+        Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+        if (possibleValues.size() != 1) {
+            throw new AssertionError("Solvable cell has no solution");
+        }
+        int value = possibleValues.iterator().next();
+
+        return new Cell(index, value);
     }
 
     public String debugPossibleValues(SegmentType segmentType) {

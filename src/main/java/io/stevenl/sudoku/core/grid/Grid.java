@@ -91,6 +91,28 @@ public class Grid {
         return columns;
     }
 
+    public Segment[] getRegions() {
+        return regions;
+    }
+
+    public Segment[] getSegments(SegmentType segmentType) {
+        Segment[] segments;
+        switch (segmentType) {
+            case ROW:
+                segments = getRows();
+                break;
+            case COLUMN:
+                segments = getColumns();
+                break;
+            case REGION:
+                segments = getRegions();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + segmentType);
+        }
+        return segments;
+    }
+
     public Segment getRow(int rowIndex) {
         return rows[rowIndex];
     }
