@@ -49,6 +49,10 @@ public class Solver {
         return solvableCells;
     }
 
+    public Map<Integer, Set<Integer>> getPossibleValuesPerCell() {
+        return possibleValuesPerCell;
+    }
+
     private void setCellValue(int index, int value) {
         Cell cell = grid.getCell(index);
         cell.setValue(value);

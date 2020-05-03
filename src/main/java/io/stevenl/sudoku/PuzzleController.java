@@ -2,6 +2,7 @@ package io.stevenl.sudoku;
 
 import io.stevenl.sudoku.core.SudokuException;
 import io.stevenl.sudoku.core.grid.Grid;
+import io.stevenl.sudoku.core.grid.TextGrid;
 import io.stevenl.sudoku.core.solver.Solver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ public class PuzzleController {
 
         Solver solver = new Solver(grid);
         model.addAttribute("solvableCells", solver.getSolvableCells());
+        model.addAttribute("possibleValuesPerCell", solver.getPossibleValuesPerCell());
+        LOGGER.info("possibleValues = {}", solver.getPossibleValuesPerCell());
         LOGGER.info("solvable = {}", solver.getSolvableCells());
 
         return "puzzle";
@@ -29,9 +32,12 @@ public class PuzzleController {
 
     @PostMapping("/puzzles")
     public String updatePuzzle(@ModelAttribute Grid grid, Model model) {
-        LOGGER.info("puzzle = {}", grid);
+        LOGGER.info("puzzle = {}", new TextGrid(grid));
+
         Solver solver = new Solver(grid);
         model.addAttribute("solvableCells", solver.getSolvableCells());
+        model.addAttribute("possibleValuesPerCell", solver.getPossibleValuesPerCell());
+        LOGGER.info("possibleValues = {}", solver.getPossibleValuesPerCell());
 
         return "puzzle";
     }

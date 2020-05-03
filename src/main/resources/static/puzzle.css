@@ -28,6 +28,8 @@ table.sudoku {
 
 /* Cells */
 .sudoku td {
+    height: 40px;
+    width: 40px;
     border: 1px solid black;
     padding: 0;
 }
@@ -40,8 +42,12 @@ table.sudoku {
     border: 0;
     padding: 0;
 }
-.sudoku td input.solvable {
+.sudoku .solvable {
     background-color: #c4dfe6;
+}
+
+.sudoku .debug {
+    font-size: small;
 }
 
 /* Don't show the arrows in the number input box - it takes up too much space */
