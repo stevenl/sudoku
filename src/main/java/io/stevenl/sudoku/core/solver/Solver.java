@@ -106,7 +106,7 @@ public class Solver {
         }
     }
 
-    /*private Cell nextHintSolePossibilityWithinSegment(Segment segment) {
+    private void optimisePossibleValues(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
         // Find where a value is possible only in one cell within a segment (e.g. row, column or region)
@@ -116,13 +116,24 @@ public class Solver {
 
             if (possibleCells.size() == 1) {
                 int index = possibleCells.iterator().next();
-                return new Cell(index, value);
+                Set<Integer> possibleValues = possibleValuesPerCell.get(index);
+                Set<Integer> toRemove = possibleValues.stream()
+                        .filter(v -> v != value)
+                        .collect(Collectors.toSet());
+                toRemove.forEach(v -> removePossibleValue(index, v));
             }
         }
-        return null;
-    }*/
+    }
 
-    private void optimisePossibleValues(Segment segment) {
+    public void optimiseMorePossibleValues() {
+        for (SegmentType segmentType : SegmentType.SEGMENT_TYPES) {
+            for (Segment segment : grid.getSegments(segmentType)) {
+                optimiseMorePossibleValues(segment);
+            }
+        }
+    }
+
+    private void optimiseMorePossibleValues(Segment segment) {
         Map<Integer, Set<Integer>> possibleCellsPerValue = getPossibleCellsPerValue(segment);
 
         // Find the value combinations that have number of possible cells matching the number of values in the
@@ -139,11 +150,14 @@ public class Solver {
         // nrPossibleCells => combinations of values with that number of cells
         Map<Integer, List<List<Integer>>> nrPossibleCells2ValueCombinations = nrPossibleCells2Values
                 .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> {
-                    int nrPossibleCells = e.getKey();
-                    List<Integer> values = e.getValue();
-                    return Combinations.combinations(values, nrPossibleCells);
-                }));
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> {
+                            int nrPossibleCells = e.getKey();
+                            List<Integer> values = e.getValue();
+                            return Combinations.combinations(values, nrPossibleCells);
+                        }
+                ));
 
         for (Map.Entry<Integer, List<List<Integer>>> e : nrPossibleCells2ValueCombinations.entrySet()) {
             int nrPossibleCells = e.getKey();
@@ -200,6 +214,9 @@ public class Solver {
         if (solvableCells.isEmpty()) {
             optimisePossibleValues();
 
+            if (solvableCells.isEmpty()) {
+                optimiseMorePossibleValues();
+            }
             if (solvableCells.isEmpty()) {
                 throw new SudokuException(String.format(
                         "Couldn't solve it. There are still %d unsolved cells", unsolvedCells.size()));
