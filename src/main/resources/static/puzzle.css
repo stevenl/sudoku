@@ -2,6 +2,11 @@ table.sudoku {
     border-collapse: collapse;
 }
 
+.sudoku caption {
+    font-size: xx-large;
+    font-weight: bold;
+}
+
 /* Mark the regions with thicker borders */
 .sudoku .region {
     border: 3px solid black;

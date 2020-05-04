@@ -8,19 +8,21 @@
 </head>
 <body>
 
-<h1>Sudoku</h1>
-
 <form action="#" th:action="@{/puzzles}" method="post">
 	<table class="sudoku">
+		<caption>Sudoku</caption>
+
 		<!--/* column groups to mark the regions */-->
-		<colgroup><col></colgroup>
+		<colgroup>
+			<col>
+		</colgroup>
 		<colgroup class="region" th:each="columns : ${grid.regionColumns}">
 			<col th:span="${columns.length}">
 		</colgroup>
 
 		<!--/* header row */-->
 		<thead>
-			<tr>
+		<tr>
 				<th scope="col"></th>
 				<th scope="col" th:each="column : ${grid.columns}" th:text="${column.index + 1}" />
 			</tr>
@@ -45,10 +47,13 @@
 </form>
 
 <div>
-	<p th:text="${'Solvable: ' + #strings.setJoin(solvableCells, ', ')}" />
 	<table class="sudoku">
+		<caption>Debug</caption>
+
 		<!--/* column groups to mark the regions */-->
-		<colgroup><col></colgroup>
+		<colgroup>
+			<col>
+		</colgroup>
 		<colgroup class="region" th:each="columns : ${grid.regionColumns}">
 			<col th:span="${columns.length}">
 		</colgroup>
