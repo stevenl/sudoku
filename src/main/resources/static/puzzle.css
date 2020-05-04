@@ -27,26 +27,30 @@ table.sudoku {
 }
 
 /* Cells */
-.sudoku td {
-    height: 40px;
-    width: 40px;
-    border: 1px solid black;
-    padding: 0;
-}
+.sudoku td,
 .sudoku td input {
     height: 40px;
     width: 40px;
     font-family: 'Kalam', cursive;
     font-size: 20px;
     text-align: center;
-    border: 0;
     padding: 0;
 }
+
+.sudoku td {
+    border: 1px solid black;
+}
+
+.sudoku td input {
+    border: 0;
+}
+
 .sudoku .solvable {
     background-color: #c4dfe6;
 }
 
 .sudoku .debug {
+    font-family: serif;
     font-size: small;
 }
 

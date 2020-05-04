@@ -64,10 +64,11 @@
 		<!--/* row groups to mark the regions */-->
 		<tbody class="region" th:each="rows : ${grid.regionRows}">
 		<tr th:each="row : ${rows}">
-			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}" />
-			<td class="debug" th:each="cell : ${row.cells}"
+			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}"/>
+			<td th:class="${cell.value == null ? 'debug' : ''}"
+				th:each="cell : ${row.cells}"
 				th:classappend="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}"
-				th:text="${#strings.setJoin(possibleValuesPerCell[cell.index], ', ')}"
+				th:text="${cell.value ?: #strings.setJoin(possibleValuesPerCell[cell.index], ', ')}"
 			/>
 		</tr>
 		</tbody>
