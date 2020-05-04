@@ -72,8 +72,8 @@ public class Solver {
         return solvableCells;
     }
 
-    public Map<Integer, Set<Integer>> getPossibleValuesPerCell() {
-        return possibleValuesPerCell;
+    public boolean isCellSolvable(int index) {
+        return solvableCells.contains(index);
     }
 
     public Set<Integer> getPossibleValues(int index) {

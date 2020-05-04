@@ -22,9 +22,7 @@ public class PuzzleController {
         model.addAttribute("grid", grid);
 
         Solver solver = new Solver(grid);
-        model.addAttribute("solvableCells", solver.getSolvableCells());
-        model.addAttribute("possibleValuesPerCell", solver.getPossibleValuesPerCell());
-        LOGGER.info("possibleValues = {}", solver.getPossibleValuesPerCell());
+        model.addAttribute("solver", solver);
         LOGGER.info("solvable = {}", solver.getSolvableCells());
 
         return "puzzle";
@@ -35,9 +33,8 @@ public class PuzzleController {
         LOGGER.info("puzzle = {}", new TextGrid(grid));
 
         Solver solver = new Solver(grid);
-        model.addAttribute("solvableCells", solver.getSolvableCells());
-        model.addAttribute("possibleValuesPerCell", solver.getPossibleValuesPerCell());
-        LOGGER.info("possibleValues = {}", solver.getPossibleValuesPerCell());
+        model.addAttribute("solver", solver);
+        LOGGER.info("solvable = {}", solver.getSolvableCells());
 
         return "puzzle";
     }

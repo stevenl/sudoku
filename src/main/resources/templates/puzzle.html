@@ -35,7 +35,7 @@
 				<td th:each="cell : ${row.cells}" th:object="${grid.cells[__${cell.index}__]}">
 					<input type="number" min="1" max="9"
 						   th:readonly="${cell.value > 0}"
-						   th:class="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}"
+						   th:class="${solver.isCellSolvable(cell.index) ? 'solvable' : ''}"
 						   th:field="*{value}"
 					/>
 				</td>
@@ -72,8 +72,8 @@
 			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}"/>
 			<td th:class="${cell.value == null ? 'debug' : ''}"
 				th:each="cell : ${row.cells}"
-				th:classappend="${#sets.contains(solvableCells, cell.index) ? 'solvable' : ''}"
-				th:text="${cell.value ?: #strings.setJoin(possibleValuesPerCell[cell.index], ', ')}"
+				th:classappend="${solver.isCellSolvable(cell.index) ? 'solvable' : ''}"
+				th:text="${cell.value ?: #strings.setJoin(solver.getPossibleValues(cell.index), ', ')}"
 			/>
 		</tr>
 		</tbody>
