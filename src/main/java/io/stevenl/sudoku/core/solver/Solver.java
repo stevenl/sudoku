@@ -39,12 +39,9 @@ public class Solver {
             }
         }
 
+        SimpleSolver.optimisePossibleValues(this, grid);
         if (solvableCells.isEmpty()) {
-            SimpleSolver.optimisePossibleValues(this, grid);
-
-            if (solvableCells.isEmpty()) {
-                AdvancedSolver.optimisePossibleValues(this, grid);
-            }
+            AdvancedSolver.optimisePossibleValues(this, grid);
         }
     }
 
@@ -74,6 +71,10 @@ public class Solver {
 
     public boolean isCellSolvable(int index) {
         return solvableCells.contains(index);
+    }
+
+    public Map<Integer, Set<Integer>> getPossibleValuesPerCell() {
+        return possibleValuesPerCell;
     }
 
     public Set<Integer> getPossibleValues(int index) {

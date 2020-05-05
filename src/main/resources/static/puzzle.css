@@ -1,5 +1,6 @@
-table.sudoku {
+.sudoku table {
     border-collapse: collapse;
+    margin-top: 2em;
 }
 
 .sudoku caption {
@@ -54,7 +55,12 @@ table.sudoku {
     background-color: #c4dfe6;
 }
 
-.sudoku .debug {
+/* Debugger */
+.debug {
+    display: none;
+}
+
+.sudoku .unsolved {
     font-family: serif;
     font-size: small;
 }

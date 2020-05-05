@@ -2,14 +2,15 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
 	<title>Sudoku Puzzle</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap" />
-	<link rel="stylesheet" type="text/css" href="/puzzle.css" />
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+	<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap" rel="stylesheet"/>
+	<link href="/puzzle.css" rel="stylesheet" type="text/css"/>
+	<script defer src="/puzzle.js"></script>
 </head>
 <body>
 
-<form action="#" th:action="@{/puzzles}" method="post">
-	<table class="sudoku">
+<div class="sudoku">
+	<table>
 		<caption>Sudoku</caption>
 
 		<!--/* column groups to mark the regions */-->
@@ -23,9 +24,9 @@
 		<!--/* header row */-->
 		<thead>
 		<tr>
-				<th scope="col"></th>
-				<th scope="col" th:each="column : ${grid.columns}" th:text="${column.index + 1}" />
-			</tr>
+			<th scope="col"><!--/* empty header column */--></th>
+			<th scope="col" th:each="column : ${grid.columns}" th:text="${column.index + 1}"/>
+		</tr>
 		</thead>
 
 		<!--/* row groups to mark the regions */-->
@@ -35,7 +36,6 @@
 				<td th:each="cell : ${row.cells}" th:object="${grid.cells[__${cell.index}__]}">
 					<input type="number" min="1" max="9"
 						   th:readonly="${cell.value > 0}"
-						   th:class="${solver.isCellSolvable(cell.index) ? 'solvable' : ''}"
 						   th:field="*{value}"
 					/>
 				</td>
@@ -43,11 +43,17 @@
 		</tbody>
 	</table>
 
-	<input type="submit" value="Update" />
-</form>
+	<div>
+		<input id="hints-toggler" type="checkbox">
+		<label for="hints-toggler">Show hints</label>
 
-<div>
-	<table class="sudoku">
+		<input id="debug-toggler" type="checkbox">
+		<label for="debug-toggler">Show debugger</label>
+	</div>
+</div>
+
+<div class="sudoku debug">
+	<table>
 		<caption>Debug</caption>
 
 		<!--/* column groups to mark the regions */-->
@@ -70,7 +76,7 @@
 		<tbody class="region" th:each="rows : ${grid.regionRows}">
 		<tr th:each="row : ${rows}">
 			<th scope="row" th:text="${#strings.substring('ABCDEFGHI', row.index, row.index + 1)}"/>
-			<td th:class="${cell.value == null ? 'debug' : ''}"
+			<td th:class="${cell.value == null ? 'unsolved' : ''}"
 				th:each="cell : ${row.cells}"
 				th:classappend="${solver.isCellSolvable(cell.index) ? 'solvable' : ''}"
 				th:text="${cell.value ?: #strings.setJoin(solver.getPossibleValues(cell.index), ', ')}"

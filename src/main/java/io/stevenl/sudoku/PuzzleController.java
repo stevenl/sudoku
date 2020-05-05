@@ -2,15 +2,12 @@ package io.stevenl.sudoku;
 
 import io.stevenl.sudoku.core.SudokuException;
 import io.stevenl.sudoku.core.grid.Grid;
-import io.stevenl.sudoku.core.grid.TextGrid;
 import io.stevenl.sudoku.core.solver.Solver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -22,17 +19,7 @@ public class PuzzleController {
         Grid grid = getGrid(level);
         model.addAttribute("grid", grid);
 
-        Solver solver = new Solver(grid);
-        model.addAttribute("solver", solver);
-        LOGGER.info("solvable = {}", solver.getSolvableCells());
-
-        return "puzzle";
-    }
-
-    @PostMapping("/puzzles")
-    public String updatePuzzle(@ModelAttribute Grid grid, Model model) {
-        LOGGER.info("puzzle = {}", new TextGrid(grid));
-
+        // For debugging
         Solver solver = new Solver(grid);
         model.addAttribute("solver", solver);
         LOGGER.info("solvable = {}", solver.getSolvableCells());
