@@ -9,7 +9,7 @@ import io.stevenl.sudoku.core.solver.Solver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class App {
+public class CliApplication {
     private static Logger logger = Logger.getAnonymousLogger();
 
     public static void main(String[] args) throws SudokuException {
