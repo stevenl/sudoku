@@ -38,12 +38,14 @@ class AdvancedSolver {
         // Group the values by the number of possible cells,
         // i.e. nrPossibleCells => list of values with that number of possible cells
         Map<Integer, List<Integer>> nrPossibleCells2Values = possibleCellsPerValue
-                .keySet().stream().collect(
-                        Collectors.groupingBy(v -> possibleCellsPerValue.get(v).size()));
+                .keySet()
+                .stream()
+                .collect(Collectors.groupingBy(v -> possibleCellsPerValue.get(v).size()));
 
         // nrPossibleCells => combinations of values with that number of cells
         Map<Integer, List<List<Integer>>> nrPossibleCells2ValueCombinations = nrPossibleCells2Values
-                .entrySet().stream()
+                .entrySet()
+                .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> {
@@ -58,7 +60,8 @@ class AdvancedSolver {
             List<List<Integer>> valueCombinations = e.getValue();
 
             for (List<Integer> valueCombo : valueCombinations) {
-                Set<Integer> possibleCellsCombined = valueCombo.stream()
+                Set<Integer> possibleCellsCombined = valueCombo
+                        .stream()
                         .map(possibleCellsPerValue::get)
                         .reduce((cells1, cells2) -> {
                             Set<Integer> union = new HashSet<>(cells1);

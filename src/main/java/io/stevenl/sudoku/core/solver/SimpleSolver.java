@@ -33,7 +33,8 @@ class SimpleSolver {
             if (possibleCells.size() == 1) {
                 int index = possibleCells.iterator().next();
                 Set<Integer> possibleValues = solver.getPossibleValues(index);
-                Set<Integer> toRemove = possibleValues.stream()
+                Set<Integer> toRemove = possibleValues
+                        .stream()
                         .filter(v -> v != value)
                         .collect(Collectors.toSet());
                 toRemove.forEach(v -> solver.removePossibleValue(index, v));
