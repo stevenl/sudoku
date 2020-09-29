@@ -1,0 +1,67 @@
+.sudoku table {
+    border-collapse: collapse;
+    margin-top: 2em;
+}
+
+.sudoku caption {
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+/* Mark the regions with thicker borders */
+.sudoku .region {
+    border: 3px solid black;
+}
+
+/* Headers */
+/* Hide the border in the header row and column */
+.sudoku th {
+    width: 25px;
+    font-weight: normal;
+    font-size: 14px;
+    color: gray;
+}
+
+.sudoku thead th {
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+}
+
+.sudoku tbody th {
+    border-top-style: hidden;
+    border-bottom-style: hidden;
+    border-left-style: hidden;
+}
+
+/* Cells */
+.sudoku td,
+.sudoku td input {
+    height: 40px;
+    width: 40px;
+    font-family: 'Kalam', cursive;
+    font-size: 20px;
+    text-align: center;
+    padding: 0;
+}
+
+.sudoku td {
+    border: 1px solid black;
+}
+
+.sudoku td input {
+    border: 0;
+}
+
+/* Don't show the arrows in the number input box - it takes up too much space */
+/* Chrome, Safari, Edge, Opera */
+.sudoku input::-webkit-outer-spin-button,
+.sudoku input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
