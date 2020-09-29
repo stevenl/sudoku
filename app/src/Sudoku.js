@@ -9,19 +9,21 @@ const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 class Sudoku extends React.Component {
     constructor(props) {
         super(props);
-        const cells = (props.game).split('').map((value) => {
-            return {
-                value: value,
-                readOnly: value > 0,
-            };
+        const values = (props.game).split('');
+        const cells = values.map((v) => {
+            if (!v || v < 1) {
+                v = NaN;
+            }
+            const cell = {value: v};
+            if (!isNaN(v)) {
+                cell.readOnly = true;
+            }
+            return cell;
         });
-        this.state = {
-            cells: cells,
-        };
+        this.state = {cells: cells};
     }
 
     render() {
-        const cells = this.state.cells;
         return (
             <div className="sudoku">
                 <table>
@@ -42,23 +44,48 @@ class Sudoku extends React.Component {
 
                     <HeaderRow />
                     <tbody className="region">
-                        <Row row="0" cells={cells} />
-                        <Row row="1" cells={cells} />
-                        <Row row="2" cells={cells} />
+                        {this.renderRow(0)}
+                        {this.renderRow(1)}
+                        {this.renderRow(2)}
                     </tbody>
                     <tbody className="region">
-                        <Row row="3" cells={cells} />
-                        <Row row="4" cells={cells} />
-                        <Row row="5" cells={cells} />
+                        {this.renderRow(3)}
+                        {this.renderRow(4)}
+                        {this.renderRow(5)}
                     </tbody>
                     <tbody className="region">
-                        <Row row="6" cells={cells} />
-                        <Row row="7" cells={cells} />
-                        <Row row="8" cells={cells} />
+                        {this.renderRow(6)}
+                        {this.renderRow(7)}
+                        {this.renderRow(8)}
                     </tbody>
                 </table>
             </div>
         );
+    }
+
+    renderRow(row) {
+        return (
+            <Row
+                row={row}
+                cells={this.state.cells}
+                onChange={(idx, val) => this.handleCellChange(idx, val)}
+            />
+        );
+    }
+
+    handleCellChange(cellIdx, value) {
+        // console.log(cellIdx, value);
+        const cell = this.state.cells[cellIdx];
+        if (cell.readOnly) {
+            return;
+        }
+
+        const newCell = {value: value};
+        const cells = this.state.cells.slice();
+        cells[cellIdx] = newCell;
+
+        this.setState({cells: cells});
+        console.log(cells);
     }
 }
 
@@ -87,24 +114,28 @@ function Row(props) {
                     key={i}
                     index={cellIdx}
                     cell={props.cells[cellIdx]}
+                    onChange={props.onChange}
                 />;
             })}
         </tr>
     );
 }
 
-function Cell(props) {
-    const cell = props.cell;
-    return (
-        <td>
-            <input
-                type="number" min="1" max="9"
-                id={'cell-' + props.index}
-                value={cell.value > 0 ? cell.value : ''}
-                readOnly={cell.readOnly}
-            />
-        </td>
-    );
+class Cell extends React.Component {
+    render() {
+        const cell = this.props.cell;
+        return (
+            <td>
+                <input
+                    type="number" min="1" max="9"
+                    id={'cell-' + this.props.index}
+                    value={cell.value ? cell.value : ''}
+                    readOnly={cell.readOnly}
+                    onChange={(e) => this.props.onChange(this.props.index, e.target.valueAsNumber)}
+                />
+            </td>
+        );
+    }
 }
 
 export default Sudoku;
