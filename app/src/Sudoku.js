@@ -9,15 +9,18 @@ const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 class Sudoku extends React.Component {
     constructor(props) {
         super(props);
-        const game = (props.game).split('');
+        const cells = (props.game).split('').map((value) => {
+            return {
+                value: value,
+                readOnly: value > 0,
+            };
+        });
         this.state = {
-            game: game,
-            cells: game.slice(),
+            cells: cells,
         };
     }
 
     render() {
-        const game = this.state.game;
         const cells = this.state.cells;
         return (
             <div className="sudoku">
@@ -39,19 +42,19 @@ class Sudoku extends React.Component {
 
                     <HeaderRow />
                     <tbody className="region">
-                    <Row row="0" game={game} cells={cells} />
-                    <Row row="1" game={game} cells={cells} />
-                    <Row row="2" game={game} cells={cells} />
+                        <Row row="0" cells={cells} />
+                        <Row row="1" cells={cells} />
+                        <Row row="2" cells={cells} />
                     </tbody>
                     <tbody className="region">
-                    <Row row="3" game={game} cells={cells} />
-                    <Row row="4" game={game} cells={cells} />
-                    <Row row="5" game={game} cells={cells} />
+                        <Row row="3" cells={cells} />
+                        <Row row="4" cells={cells} />
+                        <Row row="5" cells={cells} />
                     </tbody>
                     <tbody className="region">
-                    <Row row="6" game={game} cells={cells} />
-                    <Row row="7" game={game} cells={cells} />
-                    <Row row="8" game={game} cells={cells} />
+                        <Row row="6" cells={cells} />
+                        <Row row="7" cells={cells} />
+                        <Row row="8" cells={cells} />
                     </tbody>
                 </table>
             </div>
@@ -83,8 +86,7 @@ function Row(props) {
                 return <Cell
                     key={i}
                     index={cellIdx}
-                    value={props.cells[cellIdx]}
-                    readOnly={props.game[cellIdx] > 0}
+                    cell={props.cells[cellIdx]}
                 />;
             })}
         </tr>
@@ -92,13 +94,14 @@ function Row(props) {
 }
 
 function Cell(props) {
+    const cell = props.cell;
     return (
         <td>
             <input
                 type="number" min="1" max="9"
                 id={'cell-' + props.index}
-                value={props.value > 0 ? props.value : ''}
-                readOnly={props.readOnly}
+                value={cell.value > 0 ? cell.value : ''}
+                readOnly={cell.readOnly}
             />
         </td>
     );
