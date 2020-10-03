@@ -1,0 +1,7 @@
+# IntelliJ config files
+/.idea
+*.iml
+
+# Maven
+target/
+dependency-reduced-pom.xml
