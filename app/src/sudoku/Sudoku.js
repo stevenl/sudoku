@@ -6,17 +6,28 @@ const GRID_SIZE = 9;
 const CELL_RANGE = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
+function emptyGrid() {
+    return Array(GRID_SIZE ** 2)
+        .map((v, i) => {
+            return {index: i, value: NaN};
+        });
+}
+const GridState = React.createContext(emptyGrid());
+
 // noinspection JSUnusedLocalSymbols
 const GridDispatch = React.createContext(action => null);
 
 function reducer(grid, action) {
-    const cellIdx = action.index;
-    if (grid[cellIdx].readOnly) {
+    const cell = grid[action.index];
+    if (cell.readOnly || !action.value) {
         return grid;
     }
 
+    const newCell = Object.create(cell);
+    newCell.value = action.value;
+
     const newGrid = grid.slice();
-    newGrid[cellIdx] = {value: action.value};
+    newGrid[action.index] = newCell;
     return newGrid;
 }
 
@@ -26,12 +37,12 @@ function Sudoku(props) {
 
     function parseGrid(gridString) {
         const values = (gridString).split('');
-        return values.map((v) => {
-            if (!v || v < 1) {
-                v = NaN;
+        return values.map((val, idx) => {
+            if (!val || val < 1) {
+                val = NaN;
             }
-            const cell = {value: v};
-            if (!isNaN(v)) {
+            const cell = {index: idx, value: val};
+            if (!isNaN(val)) {
                 cell.readOnly = true;
             }
             return cell;
@@ -39,15 +50,17 @@ function Sudoku(props) {
     }
 
     return (
-        <GridDispatch.Provider value={dispatch}>
-            <div className="sudoku">
-                <Grid grid={grid} />
-            </div>
-        </GridDispatch.Provider>
+        <GridState.Provider value={grid}>
+            <GridDispatch.Provider value={dispatch}>
+                <div className="sudoku">
+                    <Grid />
+                </div>
+            </GridDispatch.Provider>
+        </GridState.Provider>
     );
 }
 
-function Grid(props) {
+function Grid() {
     return (
         <table>
             <caption>Sudoku</caption>
@@ -67,19 +80,19 @@ function Grid(props) {
 
             <HeaderRow />
             <tbody className="region">
-                <Row row={0} grid={props.grid} />
-                <Row row={1} grid={props.grid} />
-                <Row row={2} grid={props.grid} />
+                <Row row={0} />
+                <Row row={1} />
+                <Row row={2} />
             </tbody>
             <tbody className="region">
-                <Row row={3} grid={props.grid} />
-                <Row row={4} grid={props.grid} />
-                <Row row={5} grid={props.grid} />
+                <Row row={3} />
+                <Row row={4} />
+                <Row row={5} />
             </tbody>
             <tbody className="region">
-                <Row row={6} grid={props.grid} />
-                <Row row={7} grid={props.grid} />
-                <Row row={8} grid={props.grid} />
+                <Row row={6} />
+                <Row row={7} />
+                <Row row={8} />
             </tbody>
         </table>
     );
@@ -106,29 +119,28 @@ function Row(props) {
             <th scope="row">{rowLabel}</th>
             {CELL_RANGE.map((i) => {
                 const cellIdx = startIdx + i;
-                return <Cell
-                    key={cellIdx}
-                    index={cellIdx}
-                    cell={props.grid[cellIdx]}
-                />;
+                return <Cell key={cellIdx} index={cellIdx} />;
             })}
         </tr>
     );
 }
 
 function Cell(props) {
-    const cell = props.cell;
     const dispatch = useContext(GridDispatch);
+    const grid = useContext(GridState);
+    const cell = grid[props.index];
     return (
         <td>
             <input
                 type="number" min="1" max="9"
                 value={cell.value ? cell.value : ''}
                 readOnly={cell.readOnly}
-                onChange={(event) => dispatch({
-                    index: props.index,
-                    value: event.target.valueAsNumber,
-                })}
+                onChange={(event) => (
+                    dispatch({
+                        index: cell.index,
+                        value: event.target.valueAsNumber,
+                    })
+                )}
             />
         </td>
     );
