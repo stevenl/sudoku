@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Sudoku.css';
 
 const GRID_SIZE = 9;
@@ -6,15 +6,10 @@ const GRID_SIZE = 9;
 const CELL_RANGE = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
-class Sudoku extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            grid: this.parseGrid(props.gridString)
-        };
-    }
+function Sudoku(props) {
+    const [grid, setGrid] = useState(parseGrid(props.gridString));
 
-    parseGrid(gridString) {
+    function parseGrid(gridString) {
         const values = (gridString).split('');
         return values.map((v) => {
             if (!v || v < 1) {
@@ -28,68 +23,62 @@ class Sudoku extends React.Component {
         });
     }
 
-    render() {
-        return (
-            <div className="sudoku">
-                <table>
-                    <caption>Sudoku</caption>
+    return (
+        <div className="sudoku">
+            <table>
+                <caption>Sudoku</caption>
 
-                    <colgroup>
-                        <col />
-                    </colgroup>
-                    <colgroup className="region">
-                        <col span="3" />
-                    </colgroup>
-                    <colgroup className="region">
-                        <col span="3" />
-                    </colgroup>
-                    <colgroup className="region">
-                        <col span="3" />
-                    </colgroup>
+                <colgroup>
+                    <col />
+                </colgroup>
+                <colgroup className="region">
+                    <col span="3" />
+                </colgroup>
+                <colgroup className="region">
+                    <col span="3" />
+                </colgroup>
+                <colgroup className="region">
+                    <col span="3" />
+                </colgroup>
 
-                    <HeaderRow />
-                    <tbody className="region">
-                        {this.renderRow(0)}
-                        {this.renderRow(1)}
-                        {this.renderRow(2)}
-                    </tbody>
-                    <tbody className="region">
-                        {this.renderRow(3)}
-                        {this.renderRow(4)}
-                        {this.renderRow(5)}
-                    </tbody>
-                    <tbody className="region">
-                        {this.renderRow(6)}
-                        {this.renderRow(7)}
-                        {this.renderRow(8)}
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
+                <HeaderRow />
+                <tbody className="region">
+                    {renderRow(0)}
+                    {renderRow(1)}
+                    {renderRow(2)}
+                </tbody>
+                <tbody className="region">
+                    {renderRow(3)}
+                    {renderRow(4)}
+                    {renderRow(5)}
+                </tbody>
+                <tbody className="region">
+                    {renderRow(6)}
+                    {renderRow(7)}
+                    {renderRow(8)}
+                </tbody>
+            </table>
+        </div>
+    );
 
-    renderRow(row) {
+    function renderRow(row) {
         return (
             <Row
                 row={row}
-                grid={this.state.grid}
-                onChange={(idx, val) => this.handleCellChange(idx, val)}
+                grid={grid}
+                onChange={(idx, val) => handleCellChange(idx, val)}
             />
         );
     }
 
-    handleCellChange(cellIdx, value) {
-        // console.log(cellIdx, value);
-        const cell = this.state.grid[cellIdx];
-        if (cell.readOnly) {
+    function handleCellChange(cellIdx, value) {
+        if (grid[cellIdx].readOnly) {
             return;
         }
 
-        const grid = this.state.grid.slice();
-        grid[cellIdx] = {value: value};
-
-        this.setState({grid: grid});
-        console.log(grid);
+        const newGrid = grid.slice();
+        newGrid[cellIdx] = {value: value};
+        setGrid(newGrid);
     }
 }
 
