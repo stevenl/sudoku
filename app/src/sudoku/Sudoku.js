@@ -66,12 +66,12 @@ function Grid() {
 function HeaderRow() {
     return (
         <thead>
-        <tr>
-            <th>{/* empty row/column header */}</th>
-            {CELL_RANGE.map((i) =>
-                <th scope="col" key={i}>{i + 1}</th>,
-            )}
-        </tr>
+            <tr>
+                <th>{/* empty row/column header */}</th>
+                {CELL_RANGE.map((i) =>
+                    <th scope="col" key={i}>{i + 1}</th>,
+                )}
+            </tr>
         </thead>
     );
 }

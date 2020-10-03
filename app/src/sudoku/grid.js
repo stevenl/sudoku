@@ -23,11 +23,11 @@ export function parseGrid(gridString) {
 
 export function gridReducer(grid, action) {
     const cell = grid[action.index];
-    if (cell.readOnly || !action.value) {
+    if (cell.readOnly || action.value < 1) {
         return grid;
     }
 
-    const newCell = Object.create(cell);
+    const newCell = {index: cell.index, value: cell.value};
     newCell.value = action.value;
 
     const newGrid = grid.slice();
