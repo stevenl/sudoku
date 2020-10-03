@@ -1,53 +1,18 @@
 import React, { useContext, useReducer } from 'react';
+import { emptyGrid, GRID_SIZE, gridReducer, parseGrid } from './grid';
 import './Sudoku.css';
 
-const GRID_SIZE = 9;
 // const REGION_SIZE = 3;
 const CELL_RANGE = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
-function emptyGrid() {
-    return Array(GRID_SIZE ** 2)
-        .map((v, i) => {
-            return {index: i, value: NaN};
-        });
-}
 const GridState = React.createContext(emptyGrid());
-
 // noinspection JSUnusedLocalSymbols
 const GridDispatch = React.createContext(action => null);
 
-function reducer(grid, action) {
-    const cell = grid[action.index];
-    if (cell.readOnly || !action.value) {
-        return grid;
-    }
-
-    const newCell = Object.create(cell);
-    newCell.value = action.value;
-
-    const newGrid = grid.slice();
-    newGrid[action.index] = newCell;
-    return newGrid;
-}
-
 function Sudoku(props) {
     const initialGrid = parseGrid(props.gridString);
-    const [grid, dispatch] = useReducer(reducer, initialGrid);
-
-    function parseGrid(gridString) {
-        const values = (gridString).split('');
-        return values.map((val, idx) => {
-            if (!val || val < 1) {
-                val = NaN;
-            }
-            const cell = {index: idx, value: val};
-            if (!isNaN(val)) {
-                cell.readOnly = true;
-            }
-            return cell;
-        });
-    }
+    const [grid, dispatch] = useReducer(gridReducer, initialGrid);
 
     return (
         <GridState.Provider value={grid}>
