@@ -9,8 +9,14 @@ const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 class Sudoku extends React.Component {
     constructor(props) {
         super(props);
-        const values = (props.game).split('');
-        const cells = values.map((v) => {
+        this.state = {
+            grid: this.parseGrid(props.gridString)
+        };
+    }
+
+    parseGrid(gridString) {
+        const values = (gridString).split('');
+        return values.map((v) => {
             if (!v || v < 1) {
                 v = NaN;
             }
@@ -20,7 +26,6 @@ class Sudoku extends React.Component {
             }
             return cell;
         });
-        this.state = {cells: cells};
     }
 
     render() {
@@ -67,7 +72,7 @@ class Sudoku extends React.Component {
         return (
             <Row
                 row={row}
-                cells={this.state.cells}
+                grid={this.state.grid}
                 onChange={(idx, val) => this.handleCellChange(idx, val)}
             />
         );
@@ -75,17 +80,16 @@ class Sudoku extends React.Component {
 
     handleCellChange(cellIdx, value) {
         // console.log(cellIdx, value);
-        const cell = this.state.cells[cellIdx];
+        const cell = this.state.grid[cellIdx];
         if (cell.readOnly) {
             return;
         }
 
-        const newCell = {value: value};
-        const cells = this.state.cells.slice();
-        cells[cellIdx] = newCell;
+        const grid = this.state.grid.slice();
+        grid[cellIdx] = {value: value};
 
-        this.setState({cells: cells});
-        console.log(cells);
+        this.setState({grid: grid});
+        console.log(grid);
     }
 }
 
@@ -113,7 +117,7 @@ function Row(props) {
                 return <Cell
                     key={cellIdx}
                     index={cellIdx}
-                    cell={props.cells[cellIdx]}
+                    cell={props.grid[cellIdx]}
                     onChange={props.onChange}
                 />;
             })}

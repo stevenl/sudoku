@@ -7,11 +7,11 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Sudoku from './sudoku/Sudoku';
 
-const game = '000000080005073090000900300000200709900136004403009000001005000060840900070000000';
+const gridString = '000000080005073090000900300000200709900136004403009000001005000060840900070000000';
 
 ReactDOM.render(
     <React.StrictMode>
-        <Sudoku game={game} />
+        <Sudoku gridString={gridString} />
         {/*<Provider store={store}>*/}
         {/*    <App />*/}
         {/*</Provider>*/}
