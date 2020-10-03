@@ -111,7 +111,7 @@ function Row(props) {
             {CELL_RANGE.map((i) => {
                 const cellIdx = startIdx + i;
                 return <Cell
-                    key={i}
+                    key={cellIdx}
                     index={cellIdx}
                     cell={props.cells[cellIdx]}
                     onChange={props.onChange}
@@ -121,21 +121,18 @@ function Row(props) {
     );
 }
 
-class Cell extends React.Component {
-    render() {
-        const cell = this.props.cell;
-        return (
-            <td>
-                <input
-                    type="number" min="1" max="9"
-                    id={'cell-' + this.props.index}
-                    value={cell.value ? cell.value : ''}
-                    readOnly={cell.readOnly}
-                    onChange={(e) => this.props.onChange(this.props.index, e.target.valueAsNumber)}
-                />
-            </td>
-        );
-    }
+function Cell(props) {
+    const cell = props.cell;
+    return (
+        <td>
+            <input
+                type="number" min="1" max="9"
+                value={cell.value ? cell.value : ''}
+                readOnly={cell.readOnly}
+                onChange={(e) => props.onChange(props.index, e.target.valueAsNumber)}
+            />
+        </td>
+    );
 }
 
 export default Sudoku;
