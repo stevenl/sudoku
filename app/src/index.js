@@ -1,9 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import App from './app/App';
-// import store from './app/store';
-// import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import Sudoku from './sudoku/Sudoku';
 
@@ -12,9 +9,6 @@ const gridString = '000000080005073090000900300000200709900136004403009000001005
 ReactDOM.render(
     <React.StrictMode>
         <Sudoku gridString={gridString} />
-        {/*<Provider store={store}>*/}
-        {/*    <App />*/}
-        {/*</Provider>*/}
     </React.StrictMode>,
     document.getElementById('root'),
 );
