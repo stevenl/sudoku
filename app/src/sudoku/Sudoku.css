@@ -47,6 +47,7 @@
 
 .sudoku td {
     border: 1px solid black;
+    background-color: lightgray;
 }
 
 .sudoku td input {
@@ -62,6 +63,6 @@
 }
 
 /* Firefox */
-input[type=number] {
+.sudoku input[type=number] {
     -moz-appearance: textfield;
 }

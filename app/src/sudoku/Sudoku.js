@@ -91,12 +91,16 @@ function Cell(props) {
     const dispatch = useContext(DispatchContext);
     const grid = useContext(GridContext);
     const cell = grid[props.index];
+
+    if (cell.readOnly) {
+        return <td>{cell.value}</td>;
+    }
+
     return (
         <td>
             <input
                 type="number" min="1" max="9"
                 value={cell.value ? cell.value : ''}
-                readOnly={cell.readOnly}
                 onChange={(event) => (
                     dispatch({
                         type: 'setValue',
