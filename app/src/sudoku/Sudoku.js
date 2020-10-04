@@ -1,27 +1,24 @@
 import React, { useContext, useReducer } from 'react';
-import { emptyGrid, GRID_SIZE, gridReducer, parseGrid } from './grid';
+import { CELL_RANGE, GridState, GRID_SIZE, gridReducer } from './grid';
 import './Sudoku.css';
 
-// const REGION_SIZE = 3;
-const CELL_RANGE = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
-const GridState = React.createContext(emptyGrid());
+const GridContext = React.createContext(new GridState());
 // noinspection JSUnusedLocalSymbols
-const GridDispatch = React.createContext(action => null);
+const DispatchContext = React.createContext(action => null);
 
 function Sudoku(props) {
-    const initialGrid = parseGrid(props.gridString);
-    const [grid, dispatch] = useReducer(gridReducer, initialGrid);
+    const [grid, dispatch] = useReducer(gridReducer, props.gridString, (gridString) => new GridState(gridString));
 
     return (
-        <GridState.Provider value={grid}>
-            <GridDispatch.Provider value={dispatch}>
+        <GridContext.Provider value={grid}>
+            <DispatchContext.Provider value={dispatch}>
                 <div className="sudoku">
                     <Grid />
                 </div>
-            </GridDispatch.Provider>
-        </GridState.Provider>
+            </DispatchContext.Provider>
+        </GridContext.Provider>
     );
 }
 
@@ -91,8 +88,8 @@ function Row(props) {
 }
 
 function Cell(props) {
-    const dispatch = useContext(GridDispatch);
-    const grid = useContext(GridState);
+    const dispatch = useContext(DispatchContext);
+    const grid = useContext(GridContext);
     const cell = grid[props.index];
     return (
         <td>
@@ -102,6 +99,7 @@ function Cell(props) {
                 readOnly={cell.readOnly}
                 onChange={(event) => (
                     dispatch({
+                        type: 'setValue',
                         index: cell.index,
                         value: event.target.valueAsNumber,
                     })
