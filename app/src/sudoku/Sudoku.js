@@ -99,7 +99,7 @@ function Cell(props) {
     return (
         <td>
             <input
-                type="number" min="1" max="9"
+                type="number" min="1" max="9" maxLength="1"
                 value={cell.value ? cell.value : ''}
                 onChange={(event) => (
                     dispatch({
@@ -108,6 +108,7 @@ function Cell(props) {
                         value: event.target.valueAsNumber,
                     })
                 )}
+                // className={cell.error ? 'error' : ''}
             />
         </td>
     );
