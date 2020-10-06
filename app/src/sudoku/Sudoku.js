@@ -25,8 +25,6 @@ function Sudoku(props) {
 function Grid() {
     return (
         <table>
-            <caption>Sudoku</caption>
-
             <colgroup>
                 <col />
             </colgroup>

@@ -13,12 +13,7 @@
 .sudoku table {
     table-layout: fixed;
     border-collapse: collapse;
-    margin-top: 2em;
-}
-
-.sudoku caption {
-    font-size: xx-large;
-    font-weight: bold;
+    margin: 2em auto;
 }
 
 /* Mark the regions with thicker borders */
@@ -52,9 +47,9 @@
     width: var(--main-cell-size);
     padding: 0;
     text-align: center;
+    font-size: var(--main-font-size);
     font-family: var(--main-font-family);
     font-weight: normal;
-    font-size: var(--main-font-size);
     color: var(--main-color);
 }
 .sudoku td {
