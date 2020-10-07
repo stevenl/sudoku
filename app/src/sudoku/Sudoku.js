@@ -2,6 +2,7 @@ import React, { useContext, useReducer } from 'react';
 import { CELL_RANGE, GridState, GRID_SIZE, gridReducer } from './grid';
 import './Sudoku.css';
 
+const showHeaders = false;
 const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
 const GridContext = React.createContext(new GridState());
@@ -25,9 +26,11 @@ function Sudoku(props) {
 function Grid() {
     return (
         <table>
-            <colgroup>
-                <col />
-            </colgroup>
+            {showHeaders && (
+                <colgroup>
+                    <col />
+                </colgroup>
+            )}
             <colgroup className="region">
                 <col span="3" />
             </colgroup>
@@ -38,7 +41,7 @@ function Grid() {
                 <col span="3" />
             </colgroup>
 
-            <HeaderRow />
+            {showHeaders && <HeaderRow />}
             <tbody className="region">
                 <Row row={0} />
                 <Row row={1} />
@@ -62,7 +65,7 @@ function HeaderRow() {
     return (
         <thead>
             <tr>
-                <th>{/* empty row/column header */}</th>
+                <th>{/* empty row/column header */}</th>)
                 {CELL_RANGE.map((i) =>
                     <th scope="col" key={i}>{i + 1}</th>,
                 )}
@@ -76,7 +79,7 @@ function Row(props) {
     const rowLabel = ROW_LABELS[props.row];
     return (
         <tr>
-            <th scope="row">{rowLabel}</th>
+            {showHeaders && (<th scope="row">{rowLabel}</th>)}
             {CELL_RANGE.map((i) => {
                 const cellIdx = startIdx + i;
                 return <Cell key={cellIdx} index={cellIdx} />;
