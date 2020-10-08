@@ -1,5 +1,5 @@
 import React, { useContext, useReducer } from 'react';
-import { CELL_RANGE, GridState, GRID_SIZE, gridReducer } from './grid';
+import { GridState, gridReducer, GRID_INDEXES, GRID_SIZE } from './grid';
 import './Sudoku.css';
 
 const showHeaders = false;
@@ -66,7 +66,7 @@ function HeaderRow() {
         <thead>
             <tr>
                 <th>{/* empty row/column header */}</th>)
-                {CELL_RANGE.map((i) =>
+                {GRID_INDEXES.map((i) =>
                     <th scope="col" key={i}>{i + 1}</th>,
                 )}
             </tr>
@@ -80,7 +80,7 @@ function Row(props) {
     return (
         <tr>
             {showHeaders && (<th scope="row">{rowLabel}</th>)}
-            {CELL_RANGE.map((i) => {
+            {GRID_INDEXES.map((i) => {
                 const cellIdx = startIdx + i;
                 return <Cell key={cellIdx} index={cellIdx} />;
             })}
@@ -91,7 +91,7 @@ function Row(props) {
 function Cell(props) {
     const dispatch = useContext(DispatchContext);
     const grid = useContext(GridContext);
-    const cell = grid[props.index];
+    const cell = grid.cells[props.index];
 
     if (cell.readOnly) {
         return <td>{cell.value}</td>;
