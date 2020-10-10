@@ -96,7 +96,11 @@ export class CellState {
             }
         } else {
             this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
-            this.possibleValues = possibleValues || new Set(POSSIBLE_VALUES);
+            if (isNaN(this.value)) {
+                this.possibleValues = possibleValues || new Set(POSSIBLE_VALUES);
+            } else {
+                this.possibleValues = new Set();
+            }
         }
     }
 

@@ -37,10 +37,18 @@ export function gridReducer(grid, action) {
 
         // Update possibleValues to provide hints
         if (!isNaN(action.value)) {
+            // Remove the used value from related cells
             for (const c of segmentCells) {
                 if (isNaN(c.value) && c.possibleValues.has(action.value)) {
                     cells[c.index] = cellReducer(c, new RemovePossibleValueAction(action.value));
                 }
+            }
+        } else {
+            // Recalculate possible values for cell that has been cleared
+            for (let usedValue in cellsByValue) {
+                usedValue = Number(usedValue);
+                const c = cells[action.index];
+                cells[action.index] = cellReducer(c, new RemovePossibleValueAction(usedValue));
             }
         }
 
@@ -83,9 +91,9 @@ function cellReducer(cell, action) {
     let errors;
     switch (action.constructor) {
         case SetValueAction:
-            readOnly = action.readOnly;
+            readOnly = action.readOnly; // true during init()
             return new CellState(action.index, action.value, readOnly, !readOnly ? cell.errors : undefined);
-            // We will do error checking and update the error value later
+            // We will update the error value separately
         case RemovePossibleValueAction:
             const possibleValues = new Set(cell.possibleValues);
             possibleValues.delete(action.value);
