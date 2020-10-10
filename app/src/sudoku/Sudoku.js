@@ -109,7 +109,7 @@ function Cell(props) {
                         value: event.target.valueAsNumber,
                     })
                 )}
-                // className={cell.error ? 'error' : ''}
+                className={cell.errors > 0 ? 'error' : ''}
             />
         </td>
     );

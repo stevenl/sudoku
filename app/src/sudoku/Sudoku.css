@@ -6,8 +6,8 @@
 
     /* cells bg colors */
     --readonly-bg-color: #e5e5e5; /* light grey */
-    --focus-bg-color: #d8ab4e; /* golden top */
-    /* #d7c8b0; /* beigey */
+    --focus-bg-color: #fbcd48;
+    --error-bg-color: #eb8a44;
 }
 
 .sudoku table {
@@ -80,4 +80,8 @@
 /* Firefox */
 .sudoku input[type=number] {
     -moz-appearance: textfield;
+}
+
+.sudoku td input.error {
+    text-decoration: underline var(--error-bg-color) solid;
 }
