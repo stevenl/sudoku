@@ -1,5 +1,6 @@
 import React, { useContext, useReducer } from 'react';
-import { GridState, gridReducer, GRID_INDEXES, GRID_SIZE, SetValueAction } from './grid';
+import { GridState, GRID_INDEXES, GRID_SIZE } from './grid';
+import { gridReducer, SetValueAction } from './gridReducer';
 import './Sudoku.css';
 
 const showHeaders = false;
