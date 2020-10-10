@@ -1,5 +1,5 @@
 import React, { useContext, useReducer } from 'react';
-import { Action, GridState, gridReducer, GRID_INDEXES, GRID_SIZE } from './grid';
+import { GridState, gridReducer, GRID_INDEXES, GRID_SIZE, SetValueAction } from './grid';
 import './Sudoku.css';
 
 const showHeaders = false;
@@ -107,11 +107,7 @@ function Cell(props) {
                 type="number" min="1" max="9" maxLength="1"
                 value={cell.value ? cell.value : ''}
                 onChange={(event) => (
-                    dispatch({
-                        type: Action.SET_VALUE,
-                        index: cell.index,
-                        value: event.target.valueAsNumber,
-                    })
+                    dispatch(new SetValueAction(cell.index, event.target.valueAsNumber))
                 )}
                 className={cell.errors.total > 0 ? 'error' : ''}
             />
