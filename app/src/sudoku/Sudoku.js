@@ -14,7 +14,7 @@ function Sudoku(props) {
     const [grid, dispatch] = useReducer(
         gridReducer,
         props.gridString,
-        (gridString) => new GridState(gridString),
+        (gridString) => new GridState().init(gridString),
     );
 
     return (
@@ -110,7 +110,7 @@ function Cell(props) {
                 onChange={(event) => (
                     dispatch(new SetValueAction(cell.index, event.target.valueAsNumber))
                 )}
-                className={cell.errors.total > 0 ? 'error' : ''}
+                className={`${cell.possibleValues.size === 1 ? 'hint' : ''} ${cell.errors.total > 0 ? 'error' : ''}`}
             />
         </td>
     );

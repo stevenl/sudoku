@@ -1,14 +1,18 @@
 import { CellState, GridState } from './grid';
 
-export function SetValueAction(index, value) {
+export function SetValueAction(index, value, readOnly) {
     this.index = index;
     this.value = value;
+    this.readOnly = readOnly || false;
 }
 function SetErrorAction(segmentType) {
     this.segmentType = segmentType;
 }
 function ClearErrorAction(segmentType) {
     this.segmentType = segmentType;
+}
+function RemovePossibleValueAction(value) {
+    this.value = value;
 }
 
 export function gridReducer(grid, action) {
@@ -27,9 +31,20 @@ export function gridReducer(grid, action) {
     // Update the cell according to the action
     cells[action.index] = cellReducer(cell, action);
 
-    // Error checking
     for (const segmentType of ['row', 'column', 'region']) {
-        const cellsByValue = newGrid.getCellsGroupedByValue({type: segmentType, index: cell[segmentType]});
+        const segmentCells = newGrid.segmentCells({type: segmentType, index: cell[segmentType]});
+        const cellsByValue = getCellsGroupedByValue(segmentCells);
+
+        // Update possibleValues to provide hints
+        if (!isNaN(action.value)) {
+            for (const c of segmentCells) {
+                if (isNaN(c.value) && c.possibleValues.has(action.value)) {
+                    cells[c.index] = cellReducer(c, new RemovePossibleValueAction(action.value));
+                }
+            }
+        }
+
+        // Error checking
         if (!isNaN(action.value)) {
             // Mark errors
             const valueCells = cellsByValue[action.value];
@@ -64,18 +79,35 @@ function cellReducer(cell, action) {
         throw new Error(`Attempted to modify readOnly cell ${cell.index}`);
     }
 
+    let readOnly;
     let errors;
     switch (action.constructor) {
         case SetValueAction:
-            return new CellState(action.index, action.value, false, cell.errors);
-        // We will do error checking and update the error value later
+            readOnly = action.readOnly;
+            return new CellState(action.index, action.value, readOnly, !readOnly ? cell.errors : undefined);
+            // We will do error checking and update the error value later
+        case RemovePossibleValueAction:
+            const possibleValues = new Set(cell.possibleValues);
+            possibleValues.delete(action.value);
+            return new CellState(cell.index, cell.value, false, cell.errors, possibleValues);
         case SetErrorAction:
             errors = {...cell.errors, [action.segmentType]: 1, total: cell.errors.total + 1};
-            return new CellState(cell.index, cell.value, false, errors);
+            return new CellState(cell.index, cell.value, false, errors, cell.possibleValues);
         case ClearErrorAction:
             errors = {...cell.errors, [action.segmentType]: 0, total: cell.errors.total - 1};
-            return new CellState(cell.index, cell.value, false, errors);
+            return new CellState(cell.index, cell.value, false, errors, cell.possibleValues);
         default:
             throw new Error(`Unknown action type ${action.type}`);
     }
+}
+
+function getCellsGroupedByValue(cells) {
+    return cells.reduce((acc, cell) => {
+        const value = cell.value;
+        const groupedCells = acc[value] || [];
+        return {
+            ...acc,
+            ...(!isNaN(value) ? {[value]: [...groupedCells, cell]} : {}),
+        };
+    }, {});
 }

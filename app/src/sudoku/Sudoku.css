@@ -7,6 +7,7 @@
     /* cells bg colors */
     --readonly-bg-color: #e5e5e5; /* light grey */
     --focus-bg-color: #fbcd48;
+    --hint-bg-color: #a1d6e2;
     --error-bg-color: #eb8a44;
 }
 
@@ -63,6 +64,9 @@
 }
 .sudoku td input {
     border: 0;
+}
+.sudoku td input.hint {
+    background-color: var(--hint-bg-color);
 }
 .sudoku td input[type=number]:focus {
     outline: none;

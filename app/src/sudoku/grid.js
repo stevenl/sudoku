@@ -1,14 +1,15 @@
+import { gridReducer, SetValueAction } from './gridReducer';
+
 export const GRID_SIZE = 9;
 export const GRID_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const REGION_SIZE = 3;
 const REGION_INDEXES = [0, 1, 2];
+const POSSIBLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export class GridState {
     constructor(cells) {
         if (!cells) {
             this.cells = this._emptyGrid();
-        } else if (typeof cells === 'string') {
-            this.cells = this._parseGrid(cells);
         } else {
             this.cells = cells;
         }
@@ -16,6 +17,16 @@ export class GridState {
         if (this.cells.length !== GRID_SIZE ** 2) {
             throw new Error(`Grid must contain 81 cells: got ${cells.length}`);
         }
+    }
+    init(gridString) {
+        let grid = this;
+        const cells = this._parseGrid(gridString);
+        for (const cell of cells) {
+            if (!isNaN(cell.value)) {
+                grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, true));
+            }
+        }
+        return grid;
     }
 
     _emptyGrid() {
@@ -71,28 +82,21 @@ export class GridState {
                 throw new Error(`Unknown segment type '${segment.type}'`);
         }
     }
-    getCellsGroupedByValue(segment) {
-        const cells = this.segmentCells(segment);
-        return cells.reduce((acc, cell) => {
-            const value = cell.value;
-            const groupedCells = acc[value] || [];
-            return {
-                ...acc,
-                ...(!isNaN(value) ? {[value]: [...groupedCells, cell]} : {}),
-            };
-        }, {});
-    }
 }
 
 export class CellState {
-    constructor(index, value, readOnly, errors) {
+    constructor(index, value, readOnly, errors, possibleValues) {
         this.index = index;
         this.value = value;
 
         if (readOnly) {
             this.readOnly = true;
+            if (errors || possibleValues) {
+                throw new Error(`readOnly cell should not have errors or possibleValues ${errors} or ${possibleValues}`);
+            }
         } else {
             this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
+            this.possibleValues = possibleValues || new Set(POSSIBLE_VALUES);
         }
     }
 
