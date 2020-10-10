@@ -35,7 +35,7 @@ export class GridState {
             } else {
                 val = parseInt(val);
             }
-            return new CellState(idx, val, 0, !isNaN(val));
+            return new CellState(idx, val, !isNaN(val));
         });
     }
 
@@ -85,16 +85,14 @@ export class GridState {
 }
 
 class CellState {
-    constructor(index, value, errors, readOnly) {
-        if (errors < 0) {
-            throw new Error(`Can't have negative errors: ${errors}`);
-        }
-
+    constructor(index, value, readOnly, errors) {
         this.index = index;
         this.value = value;
-        this.errors = errors !== undefined ? errors : 0;
+
         if (readOnly) {
             this.readOnly = true;
+        } else {
+            this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
         }
     }
 
@@ -115,46 +113,46 @@ class CellState {
     }
 }
 
+export function Action() {}
+Action.SET_VALUE = 'setValue';
+Action.SET_ERROR = 'setError';
+Action.CLEAR_ERROR = 'clearError';
+
 export function gridReducer(grid, action) {
     // Don't change anything if the action is invalid
     const cell = grid.cells[action.index];
-    if (cell.readOnly || action.value < 1) {
+    if (cell.readOnly || action.value < 1 || action.value > 9) {
         return grid;
     }
 
-    // Clone the grid
-    const newGrid = new GridState([...grid.cells]);
+    // Clone the cells array before modifying it
+    const cells = [...grid.cells];
+    const newGrid = new GridState(cells);
     // Update the cell according to the action
-    const newCell = cellReducer(cell, action);
-    newGrid.cells[action.index] = newCell;
+    cells[action.index] = cellReducer(cell, action);
 
     // Error checking
-    if (action.type === 'setValue') {
-        const segments = ['row', 'column', 'region'];
-        for (const segment of segments) {
-            // const segmentCells = newGrid.segmentCells({type: segment, index: newCell[segment]});
-            if (isNaN(action.value)) {
-                // Clear errors
-                const cellsByValue = newGrid.getCellsGroupedByValue({type: segment, index: cell[segment]});
-                const valueCells = cellsByValue[cell.value];
-                if (valueCells !== undefined && valueCells.length === 1) {
-                    for (let c of valueCells) {
-                        if (!c.readOnly) {
-                            c = newGrid.cells[c.index]; // Get most up-to-date cell errors
-                            newGrid.cells[c.index] = cellReducer(c, {type: 'decrementError'});
-                        }
+    for (const segment of ['row', 'column', 'region']) {
+        const cellsByValue = newGrid.getCellsGroupedByValue({type: segment, index: cell[segment]});
+        if (!isNaN(action.value)) {
+            // Mark errors
+            const valueCells = cellsByValue[action.value];
+            if (valueCells !== undefined && valueCells.length > 1) {
+                for (let c of valueCells) {
+                    if (!c.readOnly && !c.errors[segment]) {
+                        c = cells[c.index]; // Get the latest cell error state
+                        cells[c.index] = cellReducer(c, {type: Action.SET_ERROR, segment: segment});
                     }
                 }
-            } else {
-                // Mark errors
-                const cellsByValue = newGrid.getCellsGroupedByValue({type: segment, index: newCell[segment]});
-                const valueCells = cellsByValue[newCell.value];
-                if (valueCells !== undefined && valueCells.length > 1) {
-                    for (let c of valueCells) {
-                        if (!c.readOnly) {
-                            c = newGrid.cells[c.index]; // Get most up-to-date cell errors
-                            newGrid.cells[c.index] = cellReducer(c, {type: 'incrementError'});
-                        }
+            }
+        } else {
+            // Clear errors
+            const valueCells = cellsByValue[cell.value];
+            if (valueCells !== undefined && valueCells.length === 1) {
+                for (let c of valueCells) {
+                    if (!c.readOnly && c.errors[segment]) {
+                        c = cells[c.index]; // Get the latest cell error state
+                        cells[c.index] = cellReducer(c, {type: Action.CLEAR_ERROR, segment: segment});
                     }
                 }
             }
@@ -170,14 +168,17 @@ function cellReducer(cell, action) {
         throw new Error(`Attempted to modify readOnly cell ${cell.index}`);
     }
 
+    let errors;
     switch (action.type) {
-        case 'setValue':
-            return new CellState(cell.index, action.value);
+        case Action.SET_VALUE:
+            return new CellState(cell.index, action.value, false, cell.errors);
             // We will do error checking and update the error value later
-        case 'incrementError':
-            return new CellState(cell.index, cell.value, cell.errors + 1);
-        case 'decrementError':
-            return new CellState(cell.index, cell.value, cell.errors - 1);
+        case Action.SET_ERROR:
+            errors = {...cell.errors, [action.segment]: 1, total: cell.errors.total + 1};
+            return new CellState(cell.index, cell.value, false, errors);
+        case Action.CLEAR_ERROR:
+            errors = {...cell.errors, [action.segment]: 0, total: cell.errors.total - 1};
+            return new CellState(cell.index, cell.value, false, errors);
         default:
             throw new Error(`Unknown action type ${action.type}`);
     }

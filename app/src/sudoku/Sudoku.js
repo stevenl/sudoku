@@ -1,5 +1,5 @@
 import React, { useContext, useReducer } from 'react';
-import { GridState, gridReducer, GRID_INDEXES, GRID_SIZE } from './grid';
+import { Action, GridState, gridReducer, GRID_INDEXES, GRID_SIZE } from './grid';
 import './Sudoku.css';
 
 const showHeaders = false;
@@ -10,7 +10,11 @@ const GridContext = React.createContext(new GridState());
 const DispatchContext = React.createContext(action => null);
 
 function Sudoku(props) {
-    const [grid, dispatch] = useReducer(gridReducer, props.gridString, (gridString) => new GridState(gridString));
+    const [grid, dispatch] = useReducer(
+        gridReducer,
+        props.gridString,
+        (gridString) => new GridState(gridString),
+    );
 
     return (
         <GridContext.Provider value={grid}>
@@ -104,12 +108,12 @@ function Cell(props) {
                 value={cell.value ? cell.value : ''}
                 onChange={(event) => (
                     dispatch({
-                        type: 'setValue',
+                        type: Action.SET_VALUE,
                         index: cell.index,
                         value: event.target.valueAsNumber,
                     })
                 )}
-                className={cell.errors > 0 ? 'error' : ''}
+                className={cell.errors.total > 0 ? 'error' : ''}
             />
         </td>
     );
