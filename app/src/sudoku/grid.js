@@ -17,10 +17,15 @@ export class GridState {
         if (this.cells.length !== GRID_SIZE ** 2) {
             throw new Error(`Grid must contain 81 cells: got ${cells.length}`);
         }
+
+        // Object.freeze(this.cells);
+        Object.freeze(this);
     }
+
     init(gridString) {
         let grid = this;
         const cells = this._parseGrid(gridString);
+        // Add each cell incrementally so the possibleValues can be kept up-to-date
         for (const cell of cells) {
             if (!isNaN(cell.value)) {
                 grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, true));
@@ -102,6 +107,10 @@ export class CellState {
                 this.possibleValues = new Set();
             }
         }
+
+        Object.freeze(this.errors);
+        Object.freeze(this.possibleValues);
+        Object.freeze(this);
     }
 
     get row() {
