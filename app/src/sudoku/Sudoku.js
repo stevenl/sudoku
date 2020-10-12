@@ -110,7 +110,7 @@ function Cell(props) {
                 onChange={(event) => (
                     dispatch(new SetValueAction(cell.index, event.target.valueAsNumber))
                 )}
-                className={`${cell.possibleValues.size === 1 ? 'hint' : ''} ${cell.errors.total > 0 ? 'error' : ''}`}
+                className={`${cell.availableValues.size === 1 ? 'hint' : ''} ${cell.errors.total > 0 ? 'error' : ''}`}
             />
         </td>
     );

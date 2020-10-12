@@ -4,7 +4,7 @@ export const GRID_SIZE = 9;
 export const GRID_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 const REGION_SIZE = 3;
 const REGION_INDEXES = [0, 1, 2];
-const POSSIBLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const AVAILABLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export class GridState {
     constructor(cells) {
@@ -25,7 +25,7 @@ export class GridState {
     init(gridString) {
         let grid = this;
         const cells = this._parseGrid(gridString);
-        // Add each cell incrementally so the possibleValues can be kept up-to-date
+        // Add each cell incrementally so the availableValues can be kept up-to-date
         for (const cell of cells) {
             if (!isNaN(cell.value)) {
                 grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, true));
@@ -90,26 +90,26 @@ export class GridState {
 }
 
 export class CellState {
-    constructor(index, value, readOnly, errors, possibleValues) {
+    constructor(index, value, readOnly, errors, availableValues) {
         this.index = index;
         this.value = value;
 
         if (readOnly) {
             this.readOnly = true;
-            if (errors || possibleValues) {
-                throw new Error(`readOnly cell should not have errors or possibleValues ${errors} or ${possibleValues}`);
+            if (errors || availableValues) {
+                throw new Error(`readOnly cell should not have errors or availableValues ${errors} or ${availableValues}`);
             }
         } else {
             this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
             if (isNaN(this.value)) {
-                this.possibleValues = possibleValues || new Set(POSSIBLE_VALUES);
+                this.availableValues = availableValues || new Set(AVAILABLE_VALUES);
             } else {
-                this.possibleValues = new Set();
+                this.availableValues = new Set();
             }
         }
 
         Object.freeze(this.errors);
-        Object.freeze(this.possibleValues);
+        Object.freeze(this.availableValues);
         Object.freeze(this);
     }
 

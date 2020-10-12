@@ -5,13 +5,13 @@ export function SetValueAction(index, value, readOnly) {
     this.value = value;
     this.readOnly = readOnly || false;
 }
-function SetErrorAction(segmentType) {
+function IncrementErrorAction(segmentType) {
     this.segmentType = segmentType;
 }
-function ClearErrorAction(segmentType) {
+function DecrementErrorAction(segmentType) {
     this.segmentType = segmentType;
 }
-function RemovePossibleValueAction(value) {
+function RemoveAvailableValueAction(value) {
     this.value = value;
 }
 
@@ -25,7 +25,6 @@ export function gridReducer(grid, action) {
         return grid;
     }
 
-    // Update possibleValues to provide hints
     if (!isNaN(action.value)) {
         return setCellValue(grid, action);
     } else {
@@ -46,10 +45,10 @@ function setCellValue(grid, action) {
         const segmentCells = newGrid.segmentCells({type: segmentType, index: oldCell[segmentType]});
         const cellsByValue = getCellsGroupedByValue(segmentCells);
 
-        // Update the possibleValues of related cells by removing this used value
+        // Update the availableValues of related cells by removing this used value
         for (const cell of segmentCells) {
-            if (isNaN(cell.value) && cell.possibleValues.has(action.value)) {
-                cells[cell.index] = cellReducer(cell, new RemovePossibleValueAction(action.value));
+            if (isNaN(cell.value) && cell.availableValues.has(action.value)) {
+                cells[cell.index] = cellReducer(cell, new RemoveAvailableValueAction(action.value));
             }
         }
 
@@ -59,7 +58,7 @@ function setCellValue(grid, action) {
             for (let cell of valueCells) {
                 if (!cell.readOnly && !cell.errors[segmentType]) {
                     cell = cells[cell.index]; // Get the latest cell error state
-                    cells[cell.index] = cellReducer(cell, new SetErrorAction(segmentType));
+                    cells[cell.index] = cellReducer(cell, new IncrementErrorAction(segmentType));
                 }
             }
         }
@@ -80,10 +79,10 @@ function clearCellValue(grid, action) {
         const segmentCells = newGrid.segmentCells({type: segmentType, index: oldCell[segmentType]});
         const cellsByValue = getCellsGroupedByValue(segmentCells);
 
-        // Ccalculate the possibleValues for the cell that has been cleared
+        // Re-calculate the availableValues for the cell that has been cleared
         for (let usedValue in cellsByValue) {
             usedValue = Number(usedValue);
-            cells[action.index] = cellReducer(newCell, new RemovePossibleValueAction(usedValue));
+            cells[action.index] = cellReducer(newCell, new RemoveAvailableValueAction(usedValue));
         }
 
         // Clear existing errors that have been resolved by clearing the cell
@@ -92,7 +91,7 @@ function clearCellValue(grid, action) {
             for (let cell of valueCells) {
                 if (!cell.readOnly && cell.errors[segmentType]) {
                     cell = cells[cell.index]; // Get the latest cell error state
-                    cells[cell.index] = cellReducer(cell, new ClearErrorAction(segmentType));
+                    cells[cell.index] = cellReducer(cell, new DecrementErrorAction(segmentType));
                 }
             }
         }
@@ -113,16 +112,16 @@ function cellReducer(cell, action) {
             readOnly = action.readOnly; // true during init()
             return new CellState(action.index, action.value, readOnly, !readOnly ? cell.errors : undefined);
             // We will update the error value separately
-        case RemovePossibleValueAction:
-            const possibleValues = new Set(cell.possibleValues);
-            possibleValues.delete(action.value);
-            return new CellState(cell.index, cell.value, false, cell.errors, possibleValues);
-        case SetErrorAction:
+        case RemoveAvailableValueAction:
+            const availableValues = new Set(cell.availableValues);
+            availableValues.delete(action.value);
+            return new CellState(cell.index, cell.value, false, cell.errors, availableValues);
+        case IncrementErrorAction:
             errors = {...cell.errors, [action.segmentType]: 1, total: cell.errors.total + 1};
-            return new CellState(cell.index, cell.value, false, errors, cell.possibleValues);
-        case ClearErrorAction:
+            return new CellState(cell.index, cell.value, false, errors, cell.availableValues);
+        case DecrementErrorAction:
             errors = {...cell.errors, [action.segmentType]: 0, total: cell.errors.total - 1};
-            return new CellState(cell.index, cell.value, false, errors, cell.possibleValues);
+            return new CellState(cell.index, cell.value, false, errors, cell.availableValues);
         default:
             throw new Error(`Unknown action type ${action.type}`);
     }
