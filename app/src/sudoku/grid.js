@@ -2,6 +2,7 @@ import { gridReducer, SetValueAction } from './gridReducer';
 
 export const GRID_SIZE = 9;
 export const GRID_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+export const SEGMENT_TYPES = ['row', 'column', 'region'];
 const REGION_SIZE = 3;
 const REGION_INDEXES = [0, 1, 2];
 const AVAILABLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -55,18 +56,20 @@ export class GridState {
         });
     }
 
-    rowCells(row) {
-        const startIdx = row * GRID_SIZE;
-        return GRID_INDEXES.map((offset) => this.cells[startIdx + offset]);
+    row(rowIndex) {
+        const startIdx = rowIndex * GRID_SIZE;
+        const cells = GRID_INDEXES.map((offset) => this.cells[startIdx + offset]);
+        return new SegmentState('row', rowIndex, cells);
     }
-    columnCells(column) {
-        return GRID_INDEXES.map((row) => this.cells[(row * GRID_SIZE) + column]);
+    column(columnIndex) {
+        const cells = GRID_INDEXES.map((row) => this.cells[(row * GRID_SIZE) + columnIndex]);
+        return new SegmentState('column', columnIndex, cells);
     }
-    regionCells(region) {
-        const regionRow = Math.trunc(region / REGION_SIZE);
-        const regionCol = region % REGION_SIZE;
+    region(regionIndex) {
+        const regionRow = Math.trunc(regionIndex / REGION_SIZE);
+        const regionCol = regionIndex % REGION_SIZE;
 
-        return REGION_INDEXES.flatMap((rowOffset) => {
+        const cells = REGION_INDEXES.flatMap((rowOffset) => {
             const row = (regionRow * REGION_SIZE) + rowOffset;
             return REGION_INDEXES.map((colOffset) => {
                 const col = (regionCol * REGION_SIZE) + colOffset;
@@ -74,18 +77,44 @@ export class GridState {
                 return this.cells[index];
             });
         });
+        return new SegmentState('region', regionIndex, cells);
     }
-    segmentCells(segment) {
-        switch (segment.type) {
+    segment(segmentType, segmentIndex) {
+        switch (segmentType) {
             case 'row':
-                return this.rowCells(segment.index);
+                return this.row(segmentIndex);
             case 'column':
-                return this.columnCells(segment.index);
+                return this.column(segmentIndex);
             case 'region':
-                return this.regionCells(segment.index);
+                return this.region(segmentIndex);
             default:
-                throw new Error(`Unknown segment type '${segment.type}'`);
+                throw new Error(`Unknown segment type '${segmentType}'`);
         }
+    }
+}
+
+class SegmentState {
+    constructor(type, index, cells) {
+        this.type = type;
+        this.index = index;
+        this.cells = cells;
+    }
+
+    get values() {
+        return this.cells
+            .map((cell) => cell.value)
+            .filter((value) => !isNaN(value));
+    }
+
+    get cellsPerValue() {
+        return this.cells.reduce((acc, cell) => {
+            const value = cell.value;
+            const groupedCells = acc[value] || [];
+            return {
+                ...acc,
+                ...(!isNaN(value) ? {[value]: [...groupedCells, cell]} : {}),
+            };
+        }, {});
     }
 }
 

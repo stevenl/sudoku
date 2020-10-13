@@ -1,4 +1,4 @@
-import { CellState, GridState } from './grid';
+import { CellState, GridState, SEGMENT_TYPES } from './grid';
 
 export function SetValueAction(index, value, readOnly) {
     this.index = index;
@@ -11,8 +11,8 @@ function IncrementErrorAction(segmentType) {
 function DecrementErrorAction(segmentType) {
     this.segmentType = segmentType;
 }
-function RemoveAvailableValueAction(value) {
-    this.value = value;
+function RemoveAvailableValuesAction(values) {
+    this.values = values;
 }
 
 export function gridReducer(grid, action) {
@@ -38,26 +38,26 @@ function setCellValue(grid, action) {
     const newGrid = new GridState(cells);
 
     // Update the cell according to the action
-    const oldCell = cells[action.index] =
-        cellReducer(cells[action.index], action);
+    const oldCell = cells[action.index];
+    const newCell = cells[action.index] = cellReducer(oldCell, action);
 
-    for (const segmentType of ['row', 'column', 'region']) {
-        const segmentCells = newGrid.segmentCells({type: segmentType, index: oldCell[segmentType]});
-        const cellsByValue = getCellsGroupedByValue(segmentCells);
+    for (const segmentType of SEGMENT_TYPES) {
+        const segmentIndex = newCell[segmentType];
+        const segment = newGrid.segment(segmentType, segmentIndex);
 
         // Update the availableValues of related cells by removing this used value
-        for (const cell of segmentCells) {
+        for (const cell of segment.cells) {
             if (isNaN(cell.value) && cell.availableValues.has(action.value)) {
-                cells[cell.index] = cellReducer(cell, new RemoveAvailableValueAction(action.value));
+                cells[cell.index] = cellReducer(cell, new RemoveAvailableValuesAction([action.value]));
             }
         }
 
         // Mark any errors if this new value has caused any
-        const valueCells = cellsByValue[action.value];
-        if (valueCells !== undefined && valueCells.length > 1) {
-            for (let cell of valueCells) {
+        const valueCells = segment.cells
+            .filter((cell) => cell.value === action.value);
+        if (valueCells.length > 1) {
+            for (const cell of valueCells) {
                 if (!cell.readOnly && !cell.errors[segmentType]) {
-                    cell = cells[cell.index]; // Get the latest cell error state
                     cells[cell.index] = cellReducer(cell, new IncrementErrorAction(segmentType));
                 }
             }
@@ -72,25 +72,23 @@ function clearCellValue(grid, action) {
     const newGrid = new GridState(cells);
 
     // Update the cell according to the action
-    const oldCell = grid.cells[action.index];
+    const oldCell = cells[action.index];
     const newCell = cells[action.index] = cellReducer(oldCell, action);
 
-    for (const segmentType of ['row', 'column', 'region']) {
-        const segmentCells = newGrid.segmentCells({type: segmentType, index: oldCell[segmentType]});
-        const cellsByValue = getCellsGroupedByValue(segmentCells);
+    for (const segmentType of SEGMENT_TYPES) {
+        const segmentIndex = oldCell[segmentType];
+        const segment = newGrid.segment(segmentType, segmentIndex);
 
         // Re-calculate the availableValues for the cell that has been cleared
-        for (let usedValue in cellsByValue) {
-            usedValue = Number(usedValue);
-            cells[action.index] = cellReducer(newCell, new RemoveAvailableValueAction(usedValue));
-        }
+        const usedValues = segment.values;
+        cells[action.index] = cellReducer(newCell, new RemoveAvailableValuesAction(usedValues));
 
         // Clear existing errors that have been resolved by clearing the cell
-        const valueCells = cellsByValue[oldCell.value];
-        if (valueCells !== undefined && valueCells.length === 1) {
-            for (let cell of valueCells) {
+        const valueCells = segment.cells
+            .filter((cell) => cell.value === oldCell.value);
+        if (valueCells.length === 1) { // More than 1 means it is still an error
+            for (const cell of valueCells) {
                 if (!cell.readOnly && cell.errors[segmentType]) {
-                    cell = cells[cell.index]; // Get the latest cell error state
                     cells[cell.index] = cellReducer(cell, new DecrementErrorAction(segmentType));
                 }
             }
@@ -110,30 +108,30 @@ function cellReducer(cell, action) {
     switch (action.constructor) {
         case SetValueAction:
             readOnly = action.readOnly; // true during init()
-            return new CellState(action.index, action.value, readOnly, !readOnly ? cell.errors : undefined);
+            errors = !readOnly ? cell.errors : undefined;
+            return new CellState(action.index, action.value, readOnly, errors);
             // We will update the error value separately
-        case RemoveAvailableValueAction:
+        case RemoveAvailableValuesAction:
             const availableValues = new Set(cell.availableValues);
-            availableValues.delete(action.value);
+            for (const value of action.values) {
+                availableValues.delete(value);
+            }
             return new CellState(cell.index, cell.value, false, cell.errors, availableValues);
         case IncrementErrorAction:
-            errors = {...cell.errors, [action.segmentType]: 1, total: cell.errors.total + 1};
+            errors = {
+                ...cell.errors,
+                [action.segmentType]: 1,
+                total: cell.errors.total + 1,
+            };
             return new CellState(cell.index, cell.value, false, errors, cell.availableValues);
         case DecrementErrorAction:
-            errors = {...cell.errors, [action.segmentType]: 0, total: cell.errors.total - 1};
+            errors = {
+                ...cell.errors,
+                [action.segmentType]: 0,
+                total: cell.errors.total - 1,
+            };
             return new CellState(cell.index, cell.value, false, errors, cell.availableValues);
         default:
             throw new Error(`Unknown action type ${action.type}`);
     }
-}
-
-function getCellsGroupedByValue(cells) {
-    return cells.reduce((acc, cell) => {
-        const value = cell.value;
-        const groupedCells = acc[value] || [];
-        return {
-            ...acc,
-            ...(!isNaN(value) ? {[value]: [...groupedCells, cell]} : {}),
-        };
-    }, {});
 }
