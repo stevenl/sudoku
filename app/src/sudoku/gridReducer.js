@@ -74,7 +74,7 @@ function clearCellValue(grid, action) {
         const usedValues = segment.values;
         newCell.removeAvailableValues(usedValues);
 
-        // Clear existing errors that have been resolved by clearing the cell
+        // Clear errors in related cells that have been resolved by clearing this cell
         const valueCells = segment.cells
             .filter((cell) => cell.value === oldCell.value);
         if (valueCells.length === 1) { // More than 1 means it is still an error
@@ -96,7 +96,7 @@ function cellReducer(cell, action) {
 
     if (action.constructor === SetValueAction) {
         const readOnly = action.readOnly; // true during init()
-        const errors = !readOnly ? cell.errors : undefined;
+        const errors = !readOnly && !isNaN(action.value) ? cell.errors : undefined;
         return new CellState(action.index, action.value, readOnly, errors);
         // We will update the error value separately
     } else {
