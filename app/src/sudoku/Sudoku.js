@@ -3,14 +3,11 @@ import { GridState, GRID_INDEXES, GRID_SIZE } from './grid';
 import { gridReducer, SetValueAction } from './gridReducer';
 import './Sudoku.css';
 
-const showHeaders = false;
-const ROW_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
-
 const GridContext = React.createContext(new GridState());
 // noinspection JSUnusedLocalSymbols
 const DispatchContext = React.createContext(action => null);
 
-function Sudoku(props) {
+export default function Sudoku(props) {
     const [grid, dispatch] = useReducer(
         gridReducer,
         props.gridString,
@@ -23,6 +20,9 @@ function Sudoku(props) {
                 <div className="sudoku">
                     <Grid />
                 </div>
+                <div className='sudoku debug'>
+                    <DebugGrid />
+                </div>
             </DispatchContext.Provider>
         </GridContext.Provider>
     );
@@ -31,11 +31,6 @@ function Sudoku(props) {
 function Grid() {
     return (
         <table>
-            {showHeaders && (
-                <colgroup>
-                    <col />
-                </colgroup>
-            )}
             <colgroup className="region">
                 <col span="3" />
             </colgroup>
@@ -46,7 +41,6 @@ function Grid() {
                 <col span="3" />
             </colgroup>
 
-            {showHeaders && <HeaderRow />}
             <tbody className="region">
                 <Row row={0} />
                 <Row row={1} />
@@ -66,27 +60,12 @@ function Grid() {
     );
 }
 
-function HeaderRow() {
-    return (
-        <thead>
-            <tr>
-                <th>{/* empty row/column header */}</th>)
-                {GRID_INDEXES.map((i) =>
-                    <th scope="col" key={i}>{i + 1}</th>,
-                )}
-            </tr>
-        </thead>
-    );
-}
-
 function Row(props) {
     const startIdx = props.row * GRID_SIZE;
-    const rowLabel = ROW_LABELS[props.row];
     return (
         <tr>
-            {showHeaders && (<th scope="row">{rowLabel}</th>)}
-            {GRID_INDEXES.map((i) => {
-                const cellIdx = startIdx + i;
+            {GRID_INDEXES.map((offset) => {
+                const cellIdx = startIdx + offset;
                 return <Cell key={cellIdx} index={cellIdx} />;
             })}
         </tr>
@@ -99,7 +78,7 @@ function Cell(props) {
     const cell = grid.cells[props.index];
 
     if (cell.readOnly) {
-        return <td>{cell.value}</td>;
+        return <td className={'readonly'}>{cell.value}</td>;
     }
 
     return (
@@ -116,4 +95,84 @@ function Cell(props) {
     );
 }
 
-export default Sudoku;
+// Debugger
+
+function DebugGrid() {
+    return (
+        <table>
+            <colgroup>
+                <col />
+            </colgroup>
+            <colgroup className="region">
+                <col span="3" />
+            </colgroup>
+            <colgroup className="region">
+                <col span="3" />
+            </colgroup>
+            <colgroup className="region">
+                <col span="3" />
+            </colgroup>
+
+            <DebugHeaderRow />
+            <tbody className="region">
+                <DebugRow row={0} />
+                <DebugRow row={1} />
+                <DebugRow row={2} />
+            </tbody>
+            <tbody className="region">
+                <DebugRow row={3} />
+                <DebugRow row={4} />
+                <DebugRow row={5} />
+            </tbody>
+            <tbody className="region">
+                <DebugRow row={6} />
+                <DebugRow row={7} />
+                <DebugRow row={8} />
+            </tbody>
+        </table>
+    );
+}
+
+function DebugHeaderRow() {
+    return (
+        <thead>
+            <tr>
+                <th>{/* empty row/column header */}</th>
+                {GRID_INDEXES.map((i) =>
+                    <th scope="col" key={i}>{i}</th>,
+                )}
+            </tr>
+        </thead>
+    );
+}
+
+function DebugRow(props) {
+    const startIdx = props.row * GRID_SIZE;
+    return (
+        <tr>
+            <th scope="row">{startIdx}</th>
+            {GRID_INDEXES.map((offset) => {
+                const cellIdx = startIdx + offset;
+                return <DebugCell key={cellIdx} index={cellIdx} />;
+            })}
+        </tr>
+    );
+}
+
+function DebugCell(props) {
+    const grid = useContext(GridContext);
+    const cell = grid.cells[props.index];
+
+    if (!isNaN(cell.value)) {
+        if (cell.readOnly) {
+            return <td className={'readonly'}>{cell.value}</td>;
+        } else {
+            return <td>{cell.value}</td>;
+        }
+    }
+    return (
+        <td className={`${cell.availableValues.size === 1 ? 'hint' : 'unsolved'}`}>
+            {Array.from(cell.availableValues).join(' ')}
+        </td>
+    );
+}

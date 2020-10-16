@@ -57,21 +57,32 @@
     border-style: solid;
     border-width: 1px;
     border-color: var(--main-color);
-    /* Mark the starting (readOnly) values that don't have an input box */
-    background-color: var(--readonly-bg-color);
-    /* Don't show the input cursor */
-    cursor: default;
 }
 .sudoku td input {
     border: 0;
 }
-.sudoku td input.hint {
+
+.sudoku .readonly {
+    background-color: var(--readonly-bg-color);
+    /* Don't show the input cursor */
+    cursor: default;
+}
+.sudoku .hint {
     background-color: var(--hint-bg-color);
 }
 .sudoku td input[type=number]:focus {
     outline: none;
     caret-color: transparent;
     background-color: var(--focus-bg-color);
+}
+
+.debug .unsolved {
+    font-size: small;
+    background-color: white;
+}
+.debug .hint {
+    font-size: small;
+    background-color: var(--hint-bg-color);
 }
 
 /* Don't show the arrows in the number input box - it takes up too much space */
