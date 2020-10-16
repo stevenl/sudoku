@@ -5,15 +5,6 @@ export function SetValueAction(index, value, readOnly) {
     this.value = value;
     this.readOnly = readOnly || false;
 }
-function IncrementErrorAction(segmentType) {
-    this.segmentType = segmentType;
-}
-function DecrementErrorAction(segmentType) {
-    this.segmentType = segmentType;
-}
-function RemoveAvailableValuesAction(values) {
-    this.values = values;
-}
 
 export function gridReducer(grid, action) {
     if (action.constructor !== SetValueAction) {
@@ -48,7 +39,7 @@ function setCellValue(grid, action) {
         // Update the availableValues of related cells by removing this used value
         for (const cell of segment.cells) {
             if (isNaN(cell.value) && cell.availableValues.has(action.value)) {
-                cells[cell.index] = cellReducer(cell, new RemoveAvailableValuesAction([action.value]));
+                cell.removeAvailableValues([action.value]);
             }
         }
 
@@ -58,7 +49,7 @@ function setCellValue(grid, action) {
         if (valueCells.length > 1) {
             for (const cell of valueCells) {
                 if (!cell.readOnly && !cell.errors[segmentType]) {
-                    cells[cell.index] = cellReducer(cell, new IncrementErrorAction(segmentType));
+                    cell.setError(segmentType);
                 }
             }
         }
@@ -81,7 +72,7 @@ function clearCellValue(grid, action) {
 
         // Re-calculate the availableValues for the cell that has been cleared
         const usedValues = segment.values;
-        cells[action.index] = cellReducer(newCell, new RemoveAvailableValuesAction(usedValues));
+        newCell.removeAvailableValues(usedValues);
 
         // Clear existing errors that have been resolved by clearing the cell
         const valueCells = segment.cells
@@ -89,7 +80,7 @@ function clearCellValue(grid, action) {
         if (valueCells.length === 1) { // More than 1 means it is still an error
             for (const cell of valueCells) {
                 if (!cell.readOnly && cell.errors[segmentType]) {
-                    cells[cell.index] = cellReducer(cell, new DecrementErrorAction(segmentType));
+                    cell.clearError(segmentType);
                 }
             }
         }
@@ -103,35 +94,12 @@ function cellReducer(cell, action) {
         throw new Error(`Attempted to modify readOnly cell ${cell.index}`);
     }
 
-    let readOnly;
-    let errors;
-    switch (action.constructor) {
-        case SetValueAction:
-            readOnly = action.readOnly; // true during init()
-            errors = !readOnly ? cell.errors : undefined;
-            return new CellState(action.index, action.value, readOnly, errors);
-            // We will update the error value separately
-        case RemoveAvailableValuesAction:
-            const availableValues = new Set(cell.availableValues);
-            for (const value of action.values) {
-                availableValues.delete(value);
-            }
-            return new CellState(cell.index, cell.value, false, cell.errors, availableValues);
-        case IncrementErrorAction:
-            errors = {
-                ...cell.errors,
-                [action.segmentType]: 1,
-                total: cell.errors.total + 1,
-            };
-            return new CellState(cell.index, cell.value, false, errors, cell.availableValues);
-        case DecrementErrorAction:
-            errors = {
-                ...cell.errors,
-                [action.segmentType]: 0,
-                total: cell.errors.total - 1,
-            };
-            return new CellState(cell.index, cell.value, false, errors, cell.availableValues);
-        default:
-            throw new Error(`Unknown action type ${action.type}`);
+    if (action.constructor === SetValueAction) {
+        const readOnly = action.readOnly; // true during init()
+        const errors = !readOnly ? cell.errors : undefined;
+        return new CellState(action.index, action.value, readOnly, errors);
+        // We will update the error value separately
+    } else {
+        throw new Error(`Unknown action type ${action.type}`);
     }
 }

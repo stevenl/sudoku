@@ -105,17 +105,6 @@ class SegmentState {
             .map((cell) => cell.value)
             .filter((value) => !isNaN(value));
     }
-
-    get cellsPerValue() {
-        return this.cells.reduce((acc, cell) => {
-            const value = cell.value;
-            const groupedCells = acc[value] || [];
-            return {
-                ...acc,
-                ...(!isNaN(value) ? {[value]: [...groupedCells, cell]} : {}),
-            };
-        }, {});
-    }
 }
 
 export class CellState {
@@ -137,8 +126,8 @@ export class CellState {
             }
         }
 
-        Object.freeze(this.errors);
-        Object.freeze(this.availableValues);
+        // Object.freeze(this.errors);
+        // Object.freeze(this.availableValues);
         Object.freeze(this);
     }
 
@@ -156,5 +145,27 @@ export class CellState {
     }
     get region() {
         return (this.regionRow * REGION_SIZE) + this.regionColumn;
+    }
+
+    setError(segmentType) {
+        if (this.errors[segmentType]) {
+            throw new Error(`Error has already been set for segment type ${segmentType}`);
+        }
+        this.errors[segmentType] = 1;
+        this.errors.total += 1;
+    }
+
+    clearError(segmentType) {
+        if (!this.errors[segmentType]) {
+            throw new Error(`Error is not set for segment type ${segmentType}`);
+        }
+        this.errors[segmentType] = 0;
+        this.errors.total -= 1;
+    }
+
+    removeAvailableValues(values) {
+        for (const value of values) {
+            this.availableValues.delete(value);
+        }
     }
 }
