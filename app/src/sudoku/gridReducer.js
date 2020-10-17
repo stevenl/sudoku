@@ -42,6 +42,7 @@ function setCellValue(grid, action) {
                 cell.removeAvailableValues([action.value]);
             }
         }
+        eliminateAvailableValues(segment);
 
         // Mark any errors if this new value has caused any
         const valueCells = segment.cells
@@ -87,6 +88,7 @@ function clearCellValue(grid, action) {
                 }
                 cell.addAvailableValue(oldCell.value);
             }
+        eliminateAvailableValues(segment);
 
         // Clear errors in related cells that have been resolved by clearing this cell
         const valueCells = segment.cells
@@ -100,6 +102,15 @@ function clearCellValue(grid, action) {
         }
     }
     return new GridState(cells);
+}
+
+function eliminateAvailableValues(segment) {
+    // Detect values that are available in one cell only
+    for (const [value, cells] of segment.cellsByAvailableValue) {
+        if (cells.length === 1) {
+            cells[0].setAvailableValue(value);
+        }
+    }
 }
 
 function cellReducer(cell, action) {

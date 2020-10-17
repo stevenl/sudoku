@@ -109,15 +109,23 @@ class SegmentState {
             .filter((value) => !isNaN(value));
     }
 
+    get cellsByAvailableValue() {
+        return this._cellsByAvailableValue = this._cellsByAvailableValue
+            || this.cells.reduce((acc, cell) => {
+                if (isNaN(cell.value)) {
+                    for (const value of cell.availableValues) {
+                        if (!acc.has(value)) {
+                            acc.set(value, []);
+                        }
+                        acc.get(value).push(cell);
+                    }
+                }
+                return acc;
+            }, new Map());
+    }
+
     isValueAvailable(value) {
-        if (!this.availableValues) {
-            const availableValues = new Set(AVAILABLE_VALUES);
-            for (const v of this.values) {
-                availableValues.delete(v);
-            }
-            this.availableValues = availableValues;
-        }
-        return this.availableValues.has(value);
+        return this.cellsByAvailableValue.has(value);
     }
 }
 
@@ -179,6 +187,11 @@ export class CellState {
         }
         this.errors[segmentType] = 0;
         this.errors.total -= 1;
+    }
+
+    setAvailableValue(value) {
+        this.availableValues.clear();
+        this.availableValues.add(value);
     }
 
     addAvailableValue(value) {
