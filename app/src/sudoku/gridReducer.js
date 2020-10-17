@@ -79,10 +79,9 @@ function clearCellValue(grid, action) {
                 if (cell.readOnly) {
                     continue;
                 }
-                for (const segmentType of SEGMENT_TYPES) {
-                    const segmentIndex = cell[segmentType];
-                    const segment = newGrid.segment(segmentType, segmentIndex);
-                    if (!segment.isValueAvailable(oldCell.value)) {
+                for (const segmentType1 of SEGMENT_TYPES) {
+                    const segment1 = newGrid.segment(segmentType1, cell[segmentType1]);
+                    if (!segment1.isValueAvailable(oldCell.value)) {
                         continue relatedCell;
                     }
                 }
