@@ -172,7 +172,7 @@ function DebugCell(props) {
     }
     return (
         <td className={`${cell.availableValues.size === 1 ? 'hint' : 'unsolved'}`}>
-            {Array.from(cell.availableValues).join(' ')}
+            {Array.from(cell.availableValues).sort().join(' ')}
         </td>
     );
 }

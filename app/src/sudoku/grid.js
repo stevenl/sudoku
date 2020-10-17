@@ -61,10 +61,12 @@ export class GridState {
         const cells = GRID_INDEXES.map((offset) => this.cells[startIdx + offset]);
         return new SegmentState('row', rowIndex, cells);
     }
+
     column(columnIndex) {
         const cells = GRID_INDEXES.map((row) => this.cells[(row * GRID_SIZE) + columnIndex]);
         return new SegmentState('column', columnIndex, cells);
     }
+
     region(regionIndex) {
         const regionRow = Math.trunc(regionIndex / REGION_SIZE);
         const regionCol = regionIndex % REGION_SIZE;
@@ -79,6 +81,7 @@ export class GridState {
         });
         return new SegmentState('region', regionIndex, cells);
     }
+
     segment(segmentType, segmentIndex) {
         switch (segmentType) {
             case 'row':
@@ -104,6 +107,17 @@ class SegmentState {
         return this.cells
             .map((cell) => cell.value)
             .filter((value) => !isNaN(value));
+    }
+
+    isValueAvailable(value) {
+        if (!this.availableValues) {
+            const availableValues = new Set(AVAILABLE_VALUES);
+            for (const v of this.values) {
+                availableValues.delete(v);
+            }
+            this.availableValues = availableValues;
+        }
+        return this.availableValues.has(value);
     }
 }
 
@@ -134,15 +148,19 @@ export class CellState {
     get row() {
         return Math.trunc(this.index / GRID_SIZE);
     }
+
     get column() {
         return this.index % GRID_SIZE;
     }
+
     get regionRow() {
         return Math.trunc(this.row / REGION_SIZE);
     }
+
     get regionColumn() {
         return Math.trunc(this.column / REGION_SIZE);
     }
+
     get region() {
         return (this.regionRow * REGION_SIZE) + this.regionColumn;
     }
@@ -161,6 +179,10 @@ export class CellState {
         }
         this.errors[segmentType] = 0;
         this.errors.total -= 1;
+    }
+
+    addAvailableValue(value) {
+        this.availableValues.add(value);
     }
 
     removeAvailableValues(values) {

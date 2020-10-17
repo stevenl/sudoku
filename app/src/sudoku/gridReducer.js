@@ -67,12 +67,27 @@ function clearCellValue(grid, action) {
     const newCell = cells[action.index] = cellReducer(oldCell, action);
 
     for (const segmentType of SEGMENT_TYPES) {
-        const segmentIndex = oldCell[segmentType];
+        const segmentIndex = newCell[segmentType];
         const segment = newGrid.segment(segmentType, segmentIndex);
 
         // Re-calculate the availableValues for the cell that has been cleared
         const usedValues = segment.values;
         newCell.removeAvailableValues(usedValues);
+        // Add old value back to availableValues of related cells
+        relatedCell:
+            for (const cell of segment.cells) {
+                if (cell.readOnly) {
+                    continue;
+                }
+                for (const segmentType of SEGMENT_TYPES) {
+                    const segmentIndex = cell[segmentType];
+                    const segment = newGrid.segment(segmentType, segmentIndex);
+                    if (!segment.isValueAvailable(oldCell.value)) {
+                        continue relatedCell;
+                    }
+                }
+                cell.addAvailableValue(oldCell.value);
+            }
 
         // Clear errors in related cells that have been resolved by clearing this cell
         const valueCells = segment.cells
