@@ -1,4 +1,4 @@
-import { CellState, GridState, SEGMENT_TYPES } from './grid';
+import {CellState, GridState, SEGMENT_TYPES} from './grid';
 
 export function SetValueAction(index, value, readOnly) {
     this.index = index;
