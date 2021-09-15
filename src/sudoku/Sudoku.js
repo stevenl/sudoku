@@ -31,18 +31,10 @@ export default function Sudoku(props) {
 function Grid() {
     return (
         <table>
-            <colgroup>
-                <col />
-            </colgroup>
-            <colgroup className="region">
-                <col span="3" />
-            </colgroup>
-            <colgroup className="region">
-                <col span="3" />
-            </colgroup>
-            <colgroup className="region">
-                <col span="3" />
-            </colgroup>
+            <colgroup span="1" />
+            <colgroup className="region" span="3" />
+            <colgroup className="region" span="3" />
+            <colgroup className="region" span="3" />
 
             <HeaderRow />
             <tbody className="region">
@@ -106,18 +98,10 @@ function Cell(props) {
 function DebugGrid() {
     return (
         <table>
-            <colgroup>
-                <col />
-            </colgroup>
-            <colgroup className="region">
-                <col span="3" />
-            </colgroup>
-            <colgroup className="region">
-                <col span="3" />
-            </colgroup>
-            <colgroup className="region">
-                <col span="3" />
-            </colgroup>
+            <colgroup span="1" />
+            <colgroup className="region" span="3" />
+            <colgroup className="region" span="3" />
+            <colgroup className="region" span="3" />
 
             <HeaderRow />
             <tbody className="region">
