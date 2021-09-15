@@ -1,4 +1,4 @@
-import { gridReducer, SetValueAction } from './gridReducer';
+import {gridReducer, SetValueAction} from './gridReducer';
 
 export const GRID_SIZE = 9;
 export const GRID_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8];

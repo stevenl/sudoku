@@ -1,6 +1,6 @@
-import React, { useContext, useReducer } from 'react';
-import { GridState, GRID_INDEXES, GRID_SIZE } from './grid';
-import { gridReducer, SetValueAction } from './gridReducer';
+import React, {useContext, useReducer} from 'react';
+import {GRID_INDEXES, GRID_SIZE, GridState} from './grid';
+import {gridReducer, SetValueAction} from './gridReducer';
 import './Sudoku.css';
 
 const GridContext = React.createContext(new GridState());
