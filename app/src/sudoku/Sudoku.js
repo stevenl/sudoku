@@ -31,6 +31,9 @@ export default function Sudoku(props) {
 function Grid() {
     return (
         <table>
+            <colgroup>
+                <col />
+            </colgroup>
             <colgroup className="region">
                 <col span="3" />
             </colgroup>
@@ -41,6 +44,7 @@ function Grid() {
                 <col span="3" />
             </colgroup>
 
+            <HeaderRow />
             <tbody className="region">
                 <Row row={0} />
                 <Row row={1} />
@@ -61,9 +65,11 @@ function Grid() {
 }
 
 function Row(props) {
+    const rowLabel = "ABCDEFGHI".charAt(props.row);
     const startIdx = props.row * GRID_SIZE;
     return (
         <tr>
+            <th scope="row">{rowLabel}</th>
             {GRID_INDEXES.map((offset) => {
                 const cellIdx = startIdx + offset;
                 return <Cell key={cellIdx} index={cellIdx} />;
@@ -113,7 +119,7 @@ function DebugGrid() {
                 <col span="3" />
             </colgroup>
 
-            <DebugHeaderRow />
+            <HeaderRow />
             <tbody className="region">
                 <DebugRow row={0} />
                 <DebugRow row={1} />
@@ -133,7 +139,7 @@ function DebugGrid() {
     );
 }
 
-function DebugHeaderRow() {
+function HeaderRow() {
     return (
         <thead>
             <tr>
@@ -147,10 +153,11 @@ function DebugHeaderRow() {
 }
 
 function DebugRow(props) {
+    const rowLabel = "ABCDEFGHI".charAt(props.row);
     const startIdx = props.row * GRID_SIZE;
     return (
         <tr>
-            <th scope="row">{startIdx}</th>
+            <th scope="row">{rowLabel}</th>
             {GRID_INDEXES.map((offset) => {
                 const cellIdx = startIdx + offset;
                 return <DebugCell key={cellIdx} index={cellIdx} />;
