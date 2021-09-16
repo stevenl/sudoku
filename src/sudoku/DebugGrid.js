@@ -1,9 +1,9 @@
 import React, {useContext} from "react";
 import {GridContext} from "./Context";
-import {Grid} from "./Grid";
+import Grid from "./Grid";
 import {GRID_INDEXES, GRID_SIZE} from "./GridState";
 
-export function DebugGrid() {
+export default function DebugGrid() {
     let cells = [];
     for (const row of GRID_INDEXES) {
         for (const col of GRID_INDEXES) {

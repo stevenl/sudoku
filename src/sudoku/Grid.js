@@ -1,6 +1,6 @@
 import {GRID_INDEXES, GRID_SIZE} from './GridState';
 
-export function Grid(props) {
+export default function Grid(props) {
     return (
         <table>
             <colgroup span="1"/>

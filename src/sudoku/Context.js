@@ -1,5 +1,5 @@
 import React from "react";
-import {GridState} from "./GridState";
+import GridState from "./GridState";
 
 // noinspection JSUnusedLocalSymbols
 export const DispatchContext = React.createContext(action => null);

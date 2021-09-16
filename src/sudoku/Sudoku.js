@@ -1,8 +1,8 @@
 import React, {useReducer} from 'react';
 import {DispatchContext, GridContext} from './Context';
-import {DebugGrid} from './DebugGrid';
-import {PuzzleGrid} from './PuzzleGrid';
-import {GridState} from './GridState';
+import DebugGrid from './DebugGrid';
+import PuzzleGrid from './PuzzleGrid';
+import GridState from './GridState';
 import {gridReducer} from './gridReducer';
 import './Sudoku.css';
 

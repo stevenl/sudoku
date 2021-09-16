@@ -1,15 +1,14 @@
 import {useContext} from "react";
 import {DispatchContext, GridContext} from "./Context";
-import {Grid} from "./Grid";
+import Grid from "./Grid";
 import {GRID_INDEXES, GRID_SIZE} from "./GridState";
 import {SetValueAction} from "./gridReducer";
 
-export function PuzzleGrid() {
+export default function PuzzleGrid() {
     let cells = [];
     for (const row of GRID_INDEXES) {
         for (const col of GRID_INDEXES) {
             const cellIdx = (row * GRID_SIZE) + col;
-            // console.log("index = ", row, col, GRID_SIZE, cellIdx);
             const cell = <Cell key={cellIdx} index={cellIdx}/>;
             cells.push(cell);
         }
