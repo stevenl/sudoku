@@ -1,5 +1,5 @@
 import React, {useContext, useReducer} from 'react';
-import {GRID_INDEXES, GRID_SIZE, GridState} from './grid';
+import {GRID_INDEXES, GRID_SIZE, GridState} from './GridState';
 import {gridReducer, SetValueAction} from './gridReducer';
 import './Sudoku.css';
 
