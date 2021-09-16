@@ -1,6 +1,6 @@
 import {useContext} from "react";
 import {DispatchContext, GridContext} from "./Context";
-import {Grid} from "./Grid.jsx";
+import {Grid} from "./Grid";
 import {GRID_INDEXES, GRID_SIZE} from "./GridState";
 import {SetValueAction} from "./gridReducer";
 
