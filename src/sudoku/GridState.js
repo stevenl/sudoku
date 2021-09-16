@@ -23,9 +23,9 @@ export class GridState {
         Object.freeze(this);
     }
 
-    init(gridString) {
-        let grid = this;
-        const cells = this._parseGrid(gridString);
+    static newFrom(gridString) {
+        let grid = new GridState();
+        const cells = grid._parseGrid(gridString);
         // Add each cell incrementally so the availableValues can be kept up-to-date
         for (const cell of cells) {
             if (!isNaN(cell.value)) {

@@ -10,7 +10,7 @@ export default function Sudoku(props) {
     const [grid, dispatch] = useReducer(
         gridReducer,
         props.gridString,
-        (gridString) => new GridState().init(gridString),
+        (gridString) => GridState.newFrom(gridString),
     );
 
     return (
