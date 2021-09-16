@@ -1,4 +1,6 @@
-import {GRID_SIZE} from "./GridState";
+import {GRID_SIZE, REGION_SIZE} from "./Grid";
+
+const AVAILABLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default class CellState {
     constructor(index, value, readOnly, errors, availableValues) {

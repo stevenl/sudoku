@@ -1,5 +1,3 @@
-import {GRID_INDEXES, GRID_SIZE} from './GridState';
-
 export default function Grid(props) {
     return (
         <table>
@@ -27,6 +25,12 @@ export default function Grid(props) {
         </table>
     );
 }
+
+export const GRID_SIZE = 9;
+export const GRID_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+export const SEGMENT_TYPES = ['row', 'column', 'region'];
+export const REGION_SIZE = 3;
+export const REGION_INDEXES = [0, 1, 2];
 
 function HeaderRow() {
     return (
