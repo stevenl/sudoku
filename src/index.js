@@ -11,8 +11,9 @@ const gridString = '000000080005073090000900300000200709900136004403009000001005
 
 ReactDOM.render(
     <React.StrictMode>
-        <p><a href="https://github.com/stevenl/sudoku/" target="_blank">Source on GitHub</a></p>
-        <Sudoku gridString={gridString} />
+        <p><a href="https://github.com/stevenl/sudoku/" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
+        </p>
+        <Sudoku gridString={gridString}/>
     </React.StrictMode>,
     document.getElementById('root'),
 );
