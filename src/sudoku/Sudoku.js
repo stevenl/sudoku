@@ -1,4 +1,5 @@
 import React, {useReducer} from 'react';
+import PropTypes from "prop-types";
 import {DispatchContext, GridContext} from './Context';
 import DebugGrid from './DebugGrid';
 import PuzzleGrid from './PuzzleGrid';
@@ -6,11 +7,10 @@ import GridState from './GridState';
 import {gridReducer} from './gridReducer';
 import './Sudoku.css';
 
-export default function Sudoku(props) {
+function Sudoku({gridString}) {
     const [grid, dispatch] = useReducer(
         gridReducer,
-        props.gridString,
-        (gridString) => GridState.newFrom(gridString),
+        GridState.newFrom(gridString),
     );
 
     return (
@@ -20,9 +20,15 @@ export default function Sudoku(props) {
                     <PuzzleGrid/>
                 </div>
                 <div className='sudoku debug'>
-                    <DebugGrid />
+                    <DebugGrid/>
                 </div>
             </DispatchContext.Provider>
         </GridContext.Provider>
     );
 }
+
+Sudoku.propTypes = {
+    gridString: PropTypes.string
+};
+
+export default Sudoku;

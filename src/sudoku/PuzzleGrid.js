@@ -1,9 +1,10 @@
 import {useContext} from "react";
+import PropTypes from "prop-types";
 import {DispatchContext, GridContext} from "./Context";
 import Grid, {GRID_INDEXES, GRID_SIZE} from "./Grid";
 import {SetValueAction} from "./gridReducer";
 
-export default function PuzzleGrid() {
+function PuzzleGrid() {
     let cells = [];
     for (const row of GRID_INDEXES) {
         for (const col of GRID_INDEXES) {
@@ -15,10 +16,10 @@ export default function PuzzleGrid() {
     return <Grid cells={cells}/>;
 }
 
-function Cell(props) {
+function Cell({index}) {
     const dispatch = useContext(DispatchContext);
     const grid = useContext(GridContext);
-    const cell = grid.cells[props.index];
+    const cell = grid.cells[index];
 
     if (cell.readOnly) {
         return <td className={'readonly'}>{cell.value}</td>;
@@ -37,3 +38,9 @@ function Cell(props) {
         </td>
     );
 }
+
+Cell.propTypes = {
+    index: PropTypes.number
+};
+
+export default PuzzleGrid;
