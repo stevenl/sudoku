@@ -121,12 +121,13 @@ function cellReducer(cell, action) {
         throw new Error(`Attempted to modify readOnly cell ${cell.index}`);
     }
 
-    if (action.constructor === SetValueAction) {
-        const readOnly = action.readOnly; // true during init()
-        const errors = !readOnly && !isNaN(action.value) ? cell.errors : undefined;
-        return new CellState(action.index, action.value, readOnly, errors);
-        // We will update the error value separately
-    } else {
-        throw new Error(`Unknown action type ${action.type}`);
+    switch (action.constructor) {
+        case SetValueAction:
+            const readOnly = action.readOnly; // true during init()
+            const errors = !readOnly && !isNaN(action.value) ? cell.errors : undefined;
+            // We will update the error value separately
+            return new CellState(action.index, action.value, readOnly, errors);
+        default:
+            throw new Error(`Unknown action type ${action.type}`);
     }
 }
