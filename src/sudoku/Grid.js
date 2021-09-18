@@ -1,30 +1,32 @@
 import PropTypes from "prop-types";
 
-function Grid({cells}) {
+function Grid({cells, className}) {
     return (
-        <table>
-            <colgroup span="1"/>
-            <colgroup className="region" span="3"/>
-            <colgroup className="region" span="3"/>
-            <colgroup className="region" span="3"/>
+        <div className={className}>
+            <table>
+                <colgroup span="1"/>
+                <colgroup className="region" span="3"/>
+                <colgroup className="region" span="3"/>
+                <colgroup className="region" span="3"/>
 
-            <HeaderRow/>
-            <tbody className="region">
-            <Row row={0} cells={cells}/>
-            <Row row={1} cells={cells}/>
-            <Row row={2} cells={cells}/>
-            </tbody>
-            <tbody className="region">
-            <Row row={3} cells={cells}/>
-            <Row row={4} cells={cells}/>
-            <Row row={5} cells={cells}/>
-            </tbody>
-            <tbody className="region">
-            <Row row={6} cells={cells}/>
-            <Row row={7} cells={cells}/>
-            <Row row={8} cells={cells}/>
-            </tbody>
-        </table>
+                <HeaderRow/>
+                <tbody className="region">
+                <Row row={0} cells={cells}/>
+                <Row row={1} cells={cells}/>
+                <Row row={2} cells={cells}/>
+                </tbody>
+                <tbody className="region">
+                <Row row={3} cells={cells}/>
+                <Row row={4} cells={cells}/>
+                <Row row={5} cells={cells}/>
+                </tbody>
+                <tbody className="region">
+                <Row row={6} cells={cells}/>
+                <Row row={7} cells={cells}/>
+                <Row row={8} cells={cells}/>
+                </tbody>
+            </table>
+        </div>
     );
 }
 
@@ -63,6 +65,7 @@ function Row({row, cells}) {
 
 Grid.propTypes = {
     cells: PropTypes.arrayOf(PropTypes.element),
+    className: PropTypes.string,
 };
 Row.propTypes = {
     row: PropTypes.number,

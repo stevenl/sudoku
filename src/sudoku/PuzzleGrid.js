@@ -13,7 +13,7 @@ function PuzzleGrid() {
             cells.push(cell);
         }
     }
-    return <Grid cells={cells}/>;
+    return <Grid className="sudoku" cells={cells}/>;
 }
 
 function Cell({index}) {

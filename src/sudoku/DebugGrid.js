@@ -13,7 +13,7 @@ function DebugGrid() {
             cells.push(cell);
         }
     }
-    return <Grid cells={cells}/>;
+    return <Grid className="sudoku debug" cells={cells}/>;
 }
 
 function DebugCell({index}) {

@@ -16,12 +16,8 @@ function Sudoku({gridString}) {
     return (
         <GridContext.Provider value={grid}>
             <DispatchContext.Provider value={dispatch}>
-                <div className="sudoku">
-                    <PuzzleGrid/>
-                </div>
-                <div className='sudoku debug'>
-                    <DebugGrid/>
-                </div>
+                <PuzzleGrid/>
+                <DebugGrid/>
             </DispatchContext.Provider>
         </GridContext.Provider>
     );
