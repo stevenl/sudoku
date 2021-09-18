@@ -1,7 +1,7 @@
 import assert from 'assert';
 import GridState from './GridState';
 import SegmentState from './SegmentState';
-import CellState from './CellState';
+import CellState, {AVAILABLE_VALUES} from './CellState';
 import {SEGMENT_TYPES} from "./Grid";
 
 export function SetValueAction(index, value, gridCells, readOnly = false) {
@@ -28,14 +28,6 @@ export function gridReducer(grid, action) {
 }
 
 function cellsReducer(cells, action) {
-    if (!isNaN(action.value)) {
-        return setCellValue(cells, action);
-    } else {
-        return clearCellValue(cells, action);
-    }
-}
-
-function setCellValue(cells, action) {
     // Clone the cells array before modifying it
     const newCells = [...cells];
 
@@ -44,142 +36,88 @@ function setCellValue(cells, action) {
     const newCell = cellReducer(oldCell, action);
     newCells[action.index] = newCell;
 
+    // Recalculate availableValues for related cells
     for (const segmentType of SEGMENT_TYPES) {
         const segmentIndex = newCell.segment(segmentType);
         const segment = SegmentState.newFrom(cells, segmentIndex, segmentType);
 
-        // Update the availableValues of related cells by removing this used value
-        for (const cell of segment.cells) {
-            if (isNaN(cell.value) && cell.availableValues.has(action.value)) {
-                removeCellAvailableValues(cell, [action.value]);
-            }
-        }
-        eliminateAvailableValues(segment);
-
-        // Mark any errors if this new value has caused any
-        const valueCells = segment.cells
-            .filter(cell => cell.value === action.value);
-        if (valueCells.length > 1) {
-            for (const cell of valueCells) {
-                if (!cell.readOnly && !cell.errors[segmentType]) {
-                    setCellError(cell, segmentType);
-                }
+        for (const segmentCell of segment.cells) {
+            if (isNaN(segmentCell.value) && segmentCell.index !== action.index) {
+                newCells[segmentCell.index] = cellReducer(segmentCell, action);
             }
         }
     }
+
     return newCells;
-}
-
-function clearCellValue(cells, action) {
-    // Clone the cells array before modifying it
-    const newCells = [...cells];
-
-    // Update the cell according to the action
-    const oldCell = newCells[action.index];
-    const newCell = cellReducer(oldCell, action);
-    newCells[action.index] = newCell;
-
-    for (const segmentType of SEGMENT_TYPES) {
-        const segmentIndex = newCell[segmentType];
-        const segment = SegmentState.newFrom(cells, segmentIndex, segmentType);
-
-        // Re-calculate the availableValues for the cell that has been cleared
-        removeCellAvailableValues(newCell, segment.values);
-        // Add old value back to availableValues of related cells
-        relatedCell:
-            for (const cell of segment.cells) {
-                if (cell.readOnly) {
-                    continue;
-                }
-                for (const segmentType1 of SEGMENT_TYPES) {
-                    const segment1 = SegmentState.newFrom(newCells, cell[segmentType1], segmentType1);
-                    if (!segment1.isValueAvailable(oldCell.value)) {
-                        continue relatedCell;
-                    }
-                }
-                addCellAvailableValue(cell, oldCell.value);
-            }
-        eliminateAvailableValues(segment);
-
-        // Clear errors in related cells that have been resolved by clearing this cell
-        const valueCells = segment.cells
-            .filter((cell) => cell.value === oldCell.value);
-        if (valueCells.length === 1) { // More than 1 means it is still an error
-            for (const cell of valueCells) {
-                if (!cell.readOnly && cell.errors[segmentType]) {
-                    clearCellError(cell, segmentType);
-                }
-            }
-        }
-    }
-    return newCells;
-}
-
-function eliminateAvailableValues(segment) {
-    // Detect values that are available in one cell only
-    for (const [value, cells] of segment.cellsByAvailableValue) {
-        if (cells.length === 1) {
-            setCellAvailableValue(cells[0], value);
-        }
-    }
 }
 
 function cellReducer(cell, action) {
-    // console.log(cell, action);
-    if (cell.readOnly) {
-        throw new Error(`Attempted to modify readOnly cell ${cell.index}`);
-    }
+    assert(!cell.readOnly, `Should not reduce a readOnly cell '${cell}'`);
 
-    switch (action.constructor) {
-        case SetValueAction:
-            // We will update the error value separately
-            return new CellState(
-                action.index,
-                reduceCellValue(cell.value, action),
-                action.readOnly, // true during initialisation
-                !action.readOnly && !isNaN(action.value) ? cell.errors : undefined,
-                //availableValues
-            );
-        default:
-            throw new Error(`Unknown action type ${action.type}`);
-    }
-}
-
-function reduceCellValue(value, action) {
-    if (action.constructor === SetValueAction) {
-        return action.value;
+    if (cell.index === action.index) {
+        if (isNaN(action.value)) {
+            return clearCell(cell, action);
+        } else {
+            return setCell(cell, action);
+        }
     } else {
-        return value;
+        assert(isNaN(cell.value), `Should not refresh cell with value '${cell.value}'`);
+        return refreshCell(cell, action);
     }
 }
 
-function setCellError(cell, segmentType) {
-    if (cell.errors[segmentType]) {
-        throw new Error(`Error has already been set for segment type ${segmentType}`);
+function setCell(cell, action) {
+    return new CellState(
+        action.index, action.value, action.readOnly,
+        action.readOnly ? undefined : cell.errors, //todo
+        undefined,
+    );
+}
+
+function clearCell(cell, action) {
+    return new CellState(
+        action.index, action.value, action.readOnly, undefined,
+        recalculateAvailableValues(cell, action),
+    );
+}
+
+function refreshCell(cell, action) {
+    return new CellState(
+        cell.index, cell.value, cell.readOnly, cell.errors,
+        recalculateAvailableValues(cell, action),
+    );
+}
+
+function recalculateAvailableValues(cell, action) {
+    const availableValues = new Set(AVAILABLE_VALUES)
+    availableValues.delete(action.value);
+
+    for (const segmentType of SEGMENT_TYPES) {
+        const segmentIndex = cell.segment(segmentType);
+        const segment = SegmentState.newFrom(action.gridCells, segmentIndex, segmentType);
+
+        for (const segmentCell of segment.cells) {
+            // The old value of the cell should not be removed from availableValues
+            if (!isNaN(segmentCell.value) && segmentCell.index !== action.index) {
+                availableValues.delete(segmentCell.value);
+            }
+        }
     }
-    cell.errors[segmentType] = 1;
-    cell.errors.total += 1;
+    return availableValues;
 }
 
-function clearCellError(cell, segmentType) {
-    if (!cell.errors[segmentType]) {
-        throw new Error(`Error is not set for segment type ${segmentType}`);
-    }
-    cell.errors[segmentType] = 0;
-    cell.errors.total -= 1;
-}
-
-function setCellAvailableValue(cell, value) {
-    cell.availableValues.clear();
-    cell.availableValues.add(value);
-}
-
-function addCellAvailableValue(cell, value) {
-    cell.availableValues.add(value);
-}
-
-function removeCellAvailableValues(cell, values) {
-    for (const value of values) {
-        cell.availableValues.delete(value);
-    }
-}
+// function setCellError(cell, segmentType) {
+//     if (cell.errors[segmentType]) {
+//         throw new Error(`Error has already been set for segment type ${segmentType}`);
+//     }
+//     cell.errors[segmentType] = 1;
+//     cell.errors.total += 1;
+// }
+//
+// function clearCellError(cell, segmentType) {
+//     if (!cell.errors[segmentType]) {
+//         throw new Error(`Error is not set for segment type ${segmentType}`);
+//     }
+//     cell.errors[segmentType] = 0;
+//     cell.errors.total -= 1;
+// }

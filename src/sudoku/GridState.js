@@ -10,11 +10,10 @@ export default class GridState {
         } else {
             this.cells = cells;
         }
-
         assert(this.cells.length === GRID_SIZE ** 2,
             `Grid has incorrect number of cells '${this.cells.length}'`);
 
-        // Object.freeze(this.cells);
+        Object.freeze(this.cells);
         Object.freeze(this);
     }
 
