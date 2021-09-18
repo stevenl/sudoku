@@ -9,8 +9,9 @@ import './Sudoku.css';
 
 function Sudoku({gridString}) {
     const [grid, dispatch] = useReducer(
-        gridReducer,
-        GridState.newFrom(gridString),
+        gridReducer, gridString, GridState.newFrom
+        // The 3rd arg for lazy initialization prevents repeated calls to
+        // dispatch() on the initial cells
     );
 
     return (
