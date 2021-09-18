@@ -1,6 +1,6 @@
 import CellState from './CellState';
 import {gridReducer, SetValueAction} from './gridReducer';
-import {GRID_INDEXES, GRID_SIZE, REGION_INDEXES, REGION_SIZE} from "./Grid";
+import {GRID_INDEXES, GRID_SIZE} from "./Grid";
 
 export default class GridState {
     constructor(cells) {
@@ -49,77 +49,5 @@ export default class GridState {
             }
             return new CellState(idx, val, !isNaN(val));
         });
-    }
-
-    row(rowIndex) {
-        const startIdx = rowIndex * GRID_SIZE;
-        const cells = GRID_INDEXES.map((offset) => this.cells[startIdx + offset]);
-        return new SegmentState('row', rowIndex, cells);
-    }
-
-    column(columnIndex) {
-        const cells = GRID_INDEXES.map((row) => this.cells[(row * GRID_SIZE) + columnIndex]);
-        return new SegmentState('column', columnIndex, cells);
-    }
-
-    region(regionIndex) {
-        const regionRow = Math.trunc(regionIndex / REGION_SIZE);
-        const regionCol = regionIndex % REGION_SIZE;
-
-        const cells = REGION_INDEXES.flatMap((rowOffset) => {
-            const row = (regionRow * REGION_SIZE) + rowOffset;
-            return REGION_INDEXES.map((colOffset) => {
-                const col = (regionCol * REGION_SIZE) + colOffset;
-                const index = (row * GRID_SIZE) + col;
-                return this.cells[index];
-            });
-        });
-        return new SegmentState('region', regionIndex, cells);
-    }
-
-    segment(segmentType, segmentIndex) {
-        switch (segmentType) {
-            case 'row':
-                return this.row(segmentIndex);
-            case 'column':
-                return this.column(segmentIndex);
-            case 'region':
-                return this.region(segmentIndex);
-            default:
-                throw new Error(`Unknown segment type '${segmentType}'`);
-        }
-    }
-}
-
-class SegmentState {
-    constructor(type, index, cells) {
-        this.type = type;
-        this.index = index;
-        this.cells = cells;
-    }
-
-    get values() {
-        return this.cells
-            .map((cell) => cell.value)
-            .filter((value) => !isNaN(value));
-    }
-
-    get cellsByAvailableValue() {
-        return this._cellsByAvailableValue = this._cellsByAvailableValue
-            || this.cells.reduce((acc, cell) => {
-                if (isNaN(cell.value)) {
-                    for (const value of cell.availableValues) {
-                        if (!acc.has(value)) {
-                            acc.set(value, []);
-                        }
-                        acc.get(value).push(cell);
-                    }
-                }
-                return acc;
-            }, new Map());
-    }
-
-    isValueAvailable(value) {
-        return this.cellsByAvailableValue.has(value);
     }
 }

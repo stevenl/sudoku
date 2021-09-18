@@ -1,4 +1,5 @@
 import GridState from './GridState';
+import SegmentState from './SegmentState';
 import CellState from './CellState';
 import {SEGMENT_TYPES} from "./Grid";
 
@@ -18,25 +19,31 @@ export function gridReducer(grid, action) {
         return grid;
     }
 
+    return new GridState(
+        cellsReducer(grid.cells, action)
+    );
+}
+
+function cellsReducer(cells, action) {
     if (!isNaN(action.value)) {
-        return setCellValue(grid, action);
+        return setCellValue(cells, action);
     } else {
-        return clearCellValue(grid, action);
+        return clearCellValue(cells, action);
     }
 }
 
-function setCellValue(grid, action) {
+function setCellValue(cells, action) {
     // Clone the cells array before modifying it
-    const cells = [...grid.cells];
-    const newGrid = new GridState(cells);
+    const newCells = [...cells];
 
     // Update the cell according to the action
-    const oldCell = cells[action.index];
-    const newCell = cells[action.index] = cellReducer(oldCell, action);
+    const oldCell = newCells[action.index];
+    const newCell = cellReducer(oldCell, action);
+    newCells[action.index] = newCell;
 
     for (const segmentType of SEGMENT_TYPES) {
         const segmentIndex = newCell.segment(segmentType);
-        const segment = newGrid.segment(segmentType, segmentIndex);
+        const segment = SegmentState.newFrom(cells, segmentIndex, segmentType);
 
         // Update the availableValues of related cells by removing this used value
         for (const cell of segment.cells) {
@@ -48,7 +55,7 @@ function setCellValue(grid, action) {
 
         // Mark any errors if this new value has caused any
         const valueCells = segment.cells
-            .filter((cell) => cell.value === action.value);
+            .filter(cell => cell.value === action.value);
         if (valueCells.length > 1) {
             for (const cell of valueCells) {
                 if (!cell.readOnly && !cell.errors[segmentType]) {
@@ -57,25 +64,24 @@ function setCellValue(grid, action) {
             }
         }
     }
-    return newGrid;
+    return newCells;
 }
 
-function clearCellValue(grid, action) {
+function clearCellValue(cells, action) {
     // Clone the cells array before modifying it
-    const cells = [...grid.cells];
-    const newGrid = new GridState(cells);
+    const newCells = [...cells];
 
     // Update the cell according to the action
-    const oldCell = cells[action.index];
-    const newCell = cells[action.index] = cellReducer(oldCell, action);
+    const oldCell = newCells[action.index];
+    const newCell = cellReducer(oldCell, action);
+    newCells[action.index] = newCell;
 
     for (const segmentType of SEGMENT_TYPES) {
         const segmentIndex = newCell[segmentType];
-        const segment = newGrid.segment(segmentType, segmentIndex);
+        const segment = SegmentState.newFrom(cells, segmentIndex, segmentType);
 
         // Re-calculate the availableValues for the cell that has been cleared
-        const usedValues = segment.values;
-        removeCellAvailableValues(newCell, usedValues);
+        removeCellAvailableValues(newCell, segment.values);
         // Add old value back to availableValues of related cells
         relatedCell:
             for (const cell of segment.cells) {
@@ -83,7 +89,7 @@ function clearCellValue(grid, action) {
                     continue;
                 }
                 for (const segmentType1 of SEGMENT_TYPES) {
-                    const segment1 = newGrid.segment(segmentType1, cell[segmentType1]);
+                    const segment1 = SegmentState.newFrom(newCells, cell[segmentType1], segmentType1);
                     if (!segment1.isValueAvailable(oldCell.value)) {
                         continue relatedCell;
                     }
@@ -103,7 +109,7 @@ function clearCellValue(grid, action) {
             }
         }
     }
-    return new GridState(cells);
+    return newCells;
 }
 
 function eliminateAvailableValues(segment) {
@@ -123,12 +129,24 @@ function cellReducer(cell, action) {
 
     switch (action.constructor) {
         case SetValueAction:
-            const readOnly = action.readOnly; // true during init()
-            const errors = !readOnly && !isNaN(action.value) ? cell.errors : undefined;
             // We will update the error value separately
-            return new CellState(action.index, action.value, readOnly, errors);
+            return new CellState(
+                action.index,
+                reduceCellValue(cell.value, action),
+                action.readOnly, // true during initialisation
+                !action.readOnly && !isNaN(action.value) ? cell.errors : undefined,
+                //availableValues
+            );
         default:
             throw new Error(`Unknown action type ${action.type}`);
+    }
+}
+
+function reduceCellValue(value, action) {
+    if (action.constructor === SetValueAction) {
+        return action.value;
+    } else {
+        return value;
     }
 }
 
