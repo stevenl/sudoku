@@ -3,9 +3,10 @@ import SegmentState from './SegmentState';
 import CellState from './CellState';
 import {SEGMENT_TYPES} from "./Grid";
 
-export function SetValueAction(index, value, readOnly) {
+export function SetValueAction(index, value, gridCells, readOnly) {
     this.index = index;
     this.value = value;
+    this.gridCells = gridCells;
     this.readOnly = readOnly || false;
 }
 

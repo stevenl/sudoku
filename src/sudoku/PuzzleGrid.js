@@ -31,7 +31,7 @@ function Cell({index}) {
                 type="number" min="1" max="9" maxLength="1"
                 value={cell.value ? cell.value : ''}
                 onChange={(event) => (
-                    dispatch(new SetValueAction(cell.index, event.target.valueAsNumber))
+                    dispatch(new SetValueAction(cell.index, event.target.valueAsNumber, grid.cells))
                 )}
                 className={`${cell.availableValues.size === 1 ? 'hint' : ''} ${cell.errors.total > 0 ? 'error' : ''}`}
             />

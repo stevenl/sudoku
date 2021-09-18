@@ -24,7 +24,7 @@ export default class GridState {
         // Add each cell incrementally so the availableValues can be kept up-to-date
         for (const cell of cells) {
             if (!isNaN(cell.value)) {
-                grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, true));
+                grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, cells, true));
             }
         }
         return grid;
