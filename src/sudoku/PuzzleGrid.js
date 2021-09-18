@@ -33,6 +33,8 @@ function Cell({index}) {
                 onChange={(event) => (
                     dispatch(new SetValueAction(cell.index, event.target.valueAsNumber, grid.cells))
                 )}
+                // A hack to prevent mouse scrolling messing up the availableValues
+                onWheel={e => e.target.blur()}
                 className={`${cell.availableValues.size === 1 ? 'hint' : ''} ${cell.errors.total > 0 ? 'error' : ''}`}
             />
         </td>
