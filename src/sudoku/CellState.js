@@ -1,3 +1,4 @@
+import assert from "assert";
 import {GRID_SIZE, REGION_SIZE} from "./Grid";
 
 const AVAILABLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -9,9 +10,8 @@ export default class CellState {
 
         if (readOnly) {
             this.readOnly = true;
-            if (errors || availableValues) {
-                throw new Error(`readOnly cell should not have errors or availableValues ${errors} or ${availableValues}`);
-            }
+            assert(!errors, `readOnly cell should not have errors '${errors}'`);
+            assert(!availableValues, `readOnly cell should not have availableValues '${availableValues}'`);
         } else {
             this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
             if (isNaN(this.value)) {

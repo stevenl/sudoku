@@ -1,3 +1,4 @@
+import assert from 'assert';
 import CellState from './CellState';
 import {gridReducer, SetValueAction} from './gridReducer';
 import {GRID_INDEXES, GRID_SIZE} from "./Grid";
@@ -10,9 +11,8 @@ export default class GridState {
             this.cells = cells;
         }
 
-        if (this.cells.length !== GRID_SIZE ** 2) {
-            throw new Error(`Grid must contain 81 cells: got ${cells.length}`);
-        }
+        assert(this.cells.length === GRID_SIZE ** 2,
+            `Grid has incorrect number of cells '${this.cells.length}'`);
 
         // Object.freeze(this.cells);
         Object.freeze(this);

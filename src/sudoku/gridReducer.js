@@ -1,19 +1,21 @@
+import assert from 'assert';
 import GridState from './GridState';
 import SegmentState from './SegmentState';
 import CellState from './CellState';
 import {SEGMENT_TYPES} from "./Grid";
 
-export function SetValueAction(index, value, gridCells, readOnly) {
+export function SetValueAction(index, value, gridCells, readOnly = false) {
     this.index = index;
     this.value = value;
     this.gridCells = gridCells;
-    this.readOnly = readOnly || false;
+
+    // Used for initialising the grid
+    this.readOnly = readOnly;
 }
 
 export function gridReducer(grid, action) {
-    if (action.constructor !== SetValueAction) {
-        throw new Error(`Invalid action ${action}`);
-    }
+    assert(action.constructor === SetValueAction,
+        `Invalid action '${action.constructor}'`);
 
     // Don't change anything if the action is invalid
     if (action.value < 1 || action.value > 9) {
