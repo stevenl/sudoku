@@ -20,7 +20,7 @@ export default class GridState {
 
     static newFrom(gridString) {
         let grid = new GridState();
-        const cells = grid._parseGrid(gridString);
+        const cells = grid._parseGridString(gridString);
         // Add each cell incrementally so the availableValues can be kept up-to-date
         for (const cell of cells) {
             if (!isNaN(cell.value)) {
@@ -39,7 +39,7 @@ export default class GridState {
         );
     }
 
-    _parseGrid(gridString) {
+    _parseGridString(gridString) {
         const values = (gridString).split('');
         return values.map((val, idx) => {
             if (!val || val < 1) {

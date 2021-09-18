@@ -46,34 +46,16 @@ export default class CellState {
         return (this.regionRow * REGION_SIZE) + this.regionColumn;
     }
 
-    setError(segmentType) {
-        if (this.errors[segmentType]) {
-            throw new Error(`Error has already been set for segment type ${segmentType}`);
-        }
-        this.errors[segmentType] = 1;
-        this.errors.total += 1;
-    }
-
-    clearError(segmentType) {
-        if (!this.errors[segmentType]) {
-            throw new Error(`Error is not set for segment type ${segmentType}`);
-        }
-        this.errors[segmentType] = 0;
-        this.errors.total -= 1;
-    }
-
-    setAvailableValue(value) {
-        this.availableValues.clear();
-        this.availableValues.add(value);
-    }
-
-    addAvailableValue(value) {
-        this.availableValues.add(value);
-    }
-
-    removeAvailableValues(values) {
-        for (const value of values) {
-            this.availableValues.delete(value);
+    segment(segmentType) {
+        switch (segmentType) {
+            case 'row':
+                return this.row;
+            case 'column':
+                return this.column;
+            case 'region':
+                return this.region;
+            default:
+                throw new Error(`Unknown segment type '${segmentType}'`);
         }
     }
 }

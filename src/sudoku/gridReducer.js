@@ -35,13 +35,13 @@ function setCellValue(grid, action) {
     const newCell = cells[action.index] = cellReducer(oldCell, action);
 
     for (const segmentType of SEGMENT_TYPES) {
-        const segmentIndex = newCell[segmentType];
+        const segmentIndex = newCell.segment(segmentType);
         const segment = newGrid.segment(segmentType, segmentIndex);
 
         // Update the availableValues of related cells by removing this used value
         for (const cell of segment.cells) {
             if (isNaN(cell.value) && cell.availableValues.has(action.value)) {
-                cell.removeAvailableValues([action.value]);
+                removeCellAvailableValues(cell, [action.value]);
             }
         }
         eliminateAvailableValues(segment);
@@ -52,7 +52,7 @@ function setCellValue(grid, action) {
         if (valueCells.length > 1) {
             for (const cell of valueCells) {
                 if (!cell.readOnly && !cell.errors[segmentType]) {
-                    cell.setError(segmentType);
+                    setCellError(cell, segmentType);
                 }
             }
         }
@@ -75,7 +75,7 @@ function clearCellValue(grid, action) {
 
         // Re-calculate the availableValues for the cell that has been cleared
         const usedValues = segment.values;
-        newCell.removeAvailableValues(usedValues);
+        removeCellAvailableValues(newCell, usedValues);
         // Add old value back to availableValues of related cells
         relatedCell:
             for (const cell of segment.cells) {
@@ -88,7 +88,7 @@ function clearCellValue(grid, action) {
                         continue relatedCell;
                     }
                 }
-                cell.addAvailableValue(oldCell.value);
+                addCellAvailableValue(cell, oldCell.value);
             }
         eliminateAvailableValues(segment);
 
@@ -98,7 +98,7 @@ function clearCellValue(grid, action) {
         if (valueCells.length === 1) { // More than 1 means it is still an error
             for (const cell of valueCells) {
                 if (!cell.readOnly && cell.errors[segmentType]) {
-                    cell.clearError(segmentType);
+                    clearCellError(cell, segmentType);
                 }
             }
         }
@@ -110,7 +110,7 @@ function eliminateAvailableValues(segment) {
     // Detect values that are available in one cell only
     for (const [value, cells] of segment.cellsByAvailableValue) {
         if (cells.length === 1) {
-            cells[0].setAvailableValue(value);
+            setCellAvailableValue(cells[0], value);
         }
     }
 }
@@ -129,5 +129,36 @@ function cellReducer(cell, action) {
             return new CellState(action.index, action.value, readOnly, errors);
         default:
             throw new Error(`Unknown action type ${action.type}`);
+    }
+}
+
+function setCellError(cell, segmentType) {
+    if (cell.errors[segmentType]) {
+        throw new Error(`Error has already been set for segment type ${segmentType}`);
+    }
+    cell.errors[segmentType] = 1;
+    cell.errors.total += 1;
+}
+
+function clearCellError(cell, segmentType) {
+    if (!cell.errors[segmentType]) {
+        throw new Error(`Error is not set for segment type ${segmentType}`);
+    }
+    cell.errors[segmentType] = 0;
+    cell.errors.total -= 1;
+}
+
+function setCellAvailableValue(cell, value) {
+    cell.availableValues.clear();
+    cell.availableValues.add(value);
+}
+
+function addCellAvailableValue(cell, value) {
+    cell.availableValues.add(value);
+}
+
+function removeCellAvailableValues(cell, values) {
+    for (const value of values) {
+        cell.availableValues.delete(value);
     }
 }
