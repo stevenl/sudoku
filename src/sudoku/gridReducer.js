@@ -2,7 +2,7 @@ import assert from 'assert';
 import GridState from './GridState';
 import SegmentState from './SegmentState';
 import CellState, {AVAILABLE_VALUES} from './CellState';
-import {SEGMENT_TYPES} from "./Grid";
+import {GRID_INDEXES, SEGMENT_TYPES} from "./Grid";
 
 export function SetValueAction(index, value, gridCells, readOnly = false) {
     this.index = index;
@@ -44,6 +44,30 @@ function cellsReducer(cells, action) {
         for (const segmentCell of segment.cells) {
             if (!segmentCell.value && segmentCell.index !== action.index) {
                 newCells[segmentCell.index] = cellReducer(segmentCell, action);
+            }
+        }
+    }
+
+    // Rule out availableValues: If a value is only possible in one cell in the
+    // whole segment, then we can rule out all other possible values in that cell
+    for (const segmentType of SEGMENT_TYPES) {
+        for (const segmentIndex of GRID_INDEXES) {
+            const segment = SegmentState.newFrom(newCells, segmentIndex, segmentType);
+
+            for (const [value, cellsForValue] of segment.cellsByAvailableValue) {
+                if (cellsForValue.length > 1) {
+                    continue;
+                }
+
+                const cell1 = cellsForValue[0];
+                if (cell1.nrAvailableValues <= 1) {
+                    continue;
+                }
+
+                newCells[cell1.index] = new CellState(
+                    cell1.index, cell1.value, cell1.readOnly, cell1.errors,
+                    new Set([value])
+                );
             }
         }
     }
