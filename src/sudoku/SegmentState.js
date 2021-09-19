@@ -48,12 +48,12 @@ export default class SegmentState {
 
 function row(gridCells, rowIndex) {
     const startIdx = rowIndex * GRID_SIZE;
-    const cells = GRID_INDEXES.map((offset) => gridCells[startIdx + offset]);
+    const cells = GRID_INDEXES.map(offset => gridCells[startIdx + offset]);
     return new SegmentState('row', rowIndex, cells);
 }
 
 function column(gridCells, columnIndex) {
-    const cells = GRID_INDEXES.map((row) => gridCells[(row * GRID_SIZE) + columnIndex]);
+    const cells = GRID_INDEXES.map(row => gridCells[(row * GRID_SIZE) + columnIndex]);
     return new SegmentState('column', columnIndex, cells);
 }
 
@@ -61,9 +61,9 @@ function region(gridCells, regionIndex) {
     const regionRow = Math.trunc(regionIndex / REGION_SIZE);
     const regionCol = regionIndex % REGION_SIZE;
 
-    const cells = REGION_INDEXES.flatMap((rowOffset) => {
+    const cells = REGION_INDEXES.flatMap(rowOffset => {
         const row = (regionRow * REGION_SIZE) + rowOffset;
-        return REGION_INDEXES.map((colOffset) => {
+        return REGION_INDEXES.map(colOffset => {
             const col = (regionCol * REGION_SIZE) + colOffset;
             const index = (row * GRID_SIZE) + col;
             return gridCells[index];

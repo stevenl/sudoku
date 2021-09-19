@@ -1,15 +1,11 @@
 import assert from 'assert';
 import CellState from './CellState';
 import {gridReducer, SetValueAction} from './gridReducer';
-import {GRID_INDEXES, GRID_SIZE} from "./Grid";
+import {GRID_SIZE} from "./Grid";
 
 export default class GridState {
     constructor(cells) {
-        if (!cells) {
-            this.cells = this._emptyGrid();
-        } else {
-            this.cells = cells;
-        }
+        this.cells = cells || emptyGrid();
         assert(this.cells.length === GRID_SIZE ** 2,
             `Grid has incorrect number of cells '${this.cells.length}'`);
 
@@ -18,9 +14,10 @@ export default class GridState {
     }
 
     static newFrom(gridString) {
-        let grid = new GridState();
-        const cells = grid._parseGridString(gridString);
+        const cells = parseGridString(gridString);
+
         // Add each cell incrementally so the availableValues can be kept up-to-date
+        let grid = new GridState();
         for (const cell of cells) {
             if (cell.value) {
                 grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, cells, true));
@@ -29,24 +26,20 @@ export default class GridState {
         return grid;
     }
 
-    _emptyGrid() {
-        let i = 0;
-        return GRID_INDEXES.flatMap(() =>
-            GRID_INDEXES.map(() =>
-                new CellState(i++, NaN)
-            )
-        );
+    cell(index) {
+        return this.cells[index];
     }
+}
 
-    _parseGridString(gridString) {
-        const values = (gridString).split('');
-        return values.map((val, idx) => {
-            if (!val || val < 1) {
-                val = NaN;
-            } else {
-                val = parseInt(val);
-            }
-            return new CellState(idx, val, !!val);
-        });
-    }
+function emptyGrid() {
+    return [...Array(GRID_SIZE ** 2).keys()]
+        .map(i => new CellState(i, NaN));
+}
+
+function parseGridString(gridString) {
+    const values = gridString.split('');
+    return values.map((val, idx) => {
+        val = val ? parseInt(val) : NaN;
+        return new CellState(idx, val, true);
+    });
 }
