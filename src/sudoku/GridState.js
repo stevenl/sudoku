@@ -1,6 +1,7 @@
+import assert from 'assert';
 import CellState from './CellState';
 import {gridReducer, SetValueAction} from './gridReducer';
-import {GRID_INDEXES, GRID_SIZE, REGION_INDEXES, REGION_SIZE} from "./Grid";
+import {GRID_INDEXES, GRID_SIZE} from "./Grid";
 
 export default class GridState {
     constructor(cells) {
@@ -9,22 +10,20 @@ export default class GridState {
         } else {
             this.cells = cells;
         }
+        assert(this.cells.length === GRID_SIZE ** 2,
+            `Grid has incorrect number of cells '${this.cells.length}'`);
 
-        if (this.cells.length !== GRID_SIZE ** 2) {
-            throw new Error(`Grid must contain 81 cells: got ${cells.length}`);
-        }
-
-        // Object.freeze(this.cells);
+        Object.freeze(this.cells);
         Object.freeze(this);
     }
 
     static newFrom(gridString) {
         let grid = new GridState();
-        const cells = grid._parseGrid(gridString);
+        const cells = grid._parseGridString(gridString);
         // Add each cell incrementally so the availableValues can be kept up-to-date
         for (const cell of cells) {
             if (!isNaN(cell.value)) {
-                grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, true));
+                grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, cells, true));
             }
         }
         return grid;
@@ -39,7 +38,7 @@ export default class GridState {
         );
     }
 
-    _parseGrid(gridString) {
+    _parseGridString(gridString) {
         const values = (gridString).split('');
         return values.map((val, idx) => {
             if (!val || val < 1) {
@@ -49,77 +48,5 @@ export default class GridState {
             }
             return new CellState(idx, val, !isNaN(val));
         });
-    }
-
-    row(rowIndex) {
-        const startIdx = rowIndex * GRID_SIZE;
-        const cells = GRID_INDEXES.map((offset) => this.cells[startIdx + offset]);
-        return new SegmentState('row', rowIndex, cells);
-    }
-
-    column(columnIndex) {
-        const cells = GRID_INDEXES.map((row) => this.cells[(row * GRID_SIZE) + columnIndex]);
-        return new SegmentState('column', columnIndex, cells);
-    }
-
-    region(regionIndex) {
-        const regionRow = Math.trunc(regionIndex / REGION_SIZE);
-        const regionCol = regionIndex % REGION_SIZE;
-
-        const cells = REGION_INDEXES.flatMap((rowOffset) => {
-            const row = (regionRow * REGION_SIZE) + rowOffset;
-            return REGION_INDEXES.map((colOffset) => {
-                const col = (regionCol * REGION_SIZE) + colOffset;
-                const index = (row * GRID_SIZE) + col;
-                return this.cells[index];
-            });
-        });
-        return new SegmentState('region', regionIndex, cells);
-    }
-
-    segment(segmentType, segmentIndex) {
-        switch (segmentType) {
-            case 'row':
-                return this.row(segmentIndex);
-            case 'column':
-                return this.column(segmentIndex);
-            case 'region':
-                return this.region(segmentIndex);
-            default:
-                throw new Error(`Unknown segment type '${segmentType}'`);
-        }
-    }
-}
-
-class SegmentState {
-    constructor(type, index, cells) {
-        this.type = type;
-        this.index = index;
-        this.cells = cells;
-    }
-
-    get values() {
-        return this.cells
-            .map((cell) => cell.value)
-            .filter((value) => !isNaN(value));
-    }
-
-    get cellsByAvailableValue() {
-        return this._cellsByAvailableValue = this._cellsByAvailableValue
-            || this.cells.reduce((acc, cell) => {
-                if (isNaN(cell.value)) {
-                    for (const value of cell.availableValues) {
-                        if (!acc.has(value)) {
-                            acc.set(value, []);
-                        }
-                        acc.get(value).push(cell);
-                    }
-                }
-                return acc;
-            }, new Map());
-    }
-
-    isValueAvailable(value) {
-        return this.cellsByAvailableValue.has(value);
     }
 }

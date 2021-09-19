@@ -1,28 +1,32 @@
-export default function Grid(props) {
-    return (
-        <table>
-            <colgroup span="1"/>
-            <colgroup className="region" span="3"/>
-            <colgroup className="region" span="3"/>
-            <colgroup className="region" span="3"/>
+import PropTypes from "prop-types";
 
-            <HeaderRow/>
-            <tbody className="region">
-            <Row row={0} cells={props.cells}/>
-            <Row row={1} cells={props.cells}/>
-            <Row row={2} cells={props.cells}/>
-            </tbody>
-            <tbody className="region">
-            <Row row={3} cells={props.cells}/>
-            <Row row={4} cells={props.cells}/>
-            <Row row={5} cells={props.cells}/>
-            </tbody>
-            <tbody className="region">
-            <Row row={6} cells={props.cells}/>
-            <Row row={7} cells={props.cells}/>
-            <Row row={8} cells={props.cells}/>
-            </tbody>
-        </table>
+function Grid({cells, className}) {
+    return (
+        <div className={className}>
+            <table>
+                <colgroup span="1"/>
+                <colgroup className="region" span="3"/>
+                <colgroup className="region" span="3"/>
+                <colgroup className="region" span="3"/>
+
+                <HeaderRow/>
+                <tbody className="region">
+                <Row row={0} cells={cells}/>
+                <Row row={1} cells={cells}/>
+                <Row row={2} cells={cells}/>
+                </tbody>
+                <tbody className="region">
+                <Row row={3} cells={cells}/>
+                <Row row={4} cells={cells}/>
+                <Row row={5} cells={cells}/>
+                </tbody>
+                <tbody className="region">
+                <Row row={6} cells={cells}/>
+                <Row row={7} cells={cells}/>
+                <Row row={8} cells={cells}/>
+                </tbody>
+            </table>
+        </div>
     );
 }
 
@@ -45,16 +49,27 @@ function HeaderRow() {
     );
 }
 
-function Row(props) {
-    const rowLabel = "ABCDEFGHI".charAt(props.row);
-    const rowStartIdx = props.row * GRID_SIZE;
+function Row({row, cells}) {
+    const rowLabel = "ABCDEFGHI".charAt(row);
+    const rowStartIdx = row * GRID_SIZE;
     return (
         <tr>
             <th scope="row">{rowLabel}</th>
             {GRID_INDEXES.map((col) => {
                 const cellIdx = rowStartIdx + col;
-                return props.cells[cellIdx];
+                return cells[cellIdx];
             })}
         </tr>
     );
 }
+
+Grid.propTypes = {
+    cells: PropTypes.arrayOf(PropTypes.element),
+    className: PropTypes.string,
+};
+Row.propTypes = {
+    row: PropTypes.number,
+    cells: PropTypes.arrayOf(PropTypes.element),
+};
+
+export default Grid;

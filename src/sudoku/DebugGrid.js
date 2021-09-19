@@ -1,8 +1,9 @@
 import React, {useContext} from "react";
+import PropTypes from "prop-types";
 import {GridContext} from "./Context";
 import Grid, {GRID_INDEXES, GRID_SIZE} from "./Grid";
 
-export default function DebugGrid() {
+function DebugGrid() {
     let cells = [];
     for (const row of GRID_INDEXES) {
         for (const col of GRID_INDEXES) {
@@ -12,12 +13,12 @@ export default function DebugGrid() {
             cells.push(cell);
         }
     }
-    return <Grid cells={cells}/>;
+    return <Grid className="sudoku debug" cells={cells}/>;
 }
 
-function DebugCell(props) {
+function DebugCell({index}) {
     const grid = useContext(GridContext);
-    const cell = grid.cells[props.index];
+    const cell = grid.cells[index];
 
     if (!isNaN(cell.value)) {
         if (cell.readOnly) {
@@ -32,3 +33,9 @@ function DebugCell(props) {
         </td>
     );
 }
+
+DebugCell.propTypes = {
+    index: PropTypes.number
+};
+
+export default DebugGrid;

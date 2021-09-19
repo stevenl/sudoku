@@ -1,6 +1,7 @@
+import assert from "assert";
 import {GRID_SIZE, REGION_SIZE} from "./Grid";
 
-const AVAILABLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+export const AVAILABLE_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default class CellState {
     constructor(index, value, readOnly, errors, availableValues) {
@@ -9,9 +10,8 @@ export default class CellState {
 
         if (readOnly) {
             this.readOnly = true;
-            if (errors || availableValues) {
-                throw new Error(`readOnly cell should not have errors or availableValues ${errors} or ${availableValues}`);
-            }
+            assert(!errors, `readOnly cell should not have errors '${errors}'`);
+            assert(!availableValues, `readOnly cell should not have availableValues '${availableValues}'`);
         } else {
             this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
             if (isNaN(this.value)) {
@@ -21,8 +21,8 @@ export default class CellState {
             }
         }
 
-        // Object.freeze(this.errors);
-        // Object.freeze(this.availableValues);
+        Object.freeze(this.errors);
+        Object.freeze(this.availableValues);
         Object.freeze(this);
     }
 
@@ -46,34 +46,16 @@ export default class CellState {
         return (this.regionRow * REGION_SIZE) + this.regionColumn;
     }
 
-    setError(segmentType) {
-        if (this.errors[segmentType]) {
-            throw new Error(`Error has already been set for segment type ${segmentType}`);
-        }
-        this.errors[segmentType] = 1;
-        this.errors.total += 1;
-    }
-
-    clearError(segmentType) {
-        if (!this.errors[segmentType]) {
-            throw new Error(`Error is not set for segment type ${segmentType}`);
-        }
-        this.errors[segmentType] = 0;
-        this.errors.total -= 1;
-    }
-
-    setAvailableValue(value) {
-        this.availableValues.clear();
-        this.availableValues.add(value);
-    }
-
-    addAvailableValue(value) {
-        this.availableValues.add(value);
-    }
-
-    removeAvailableValues(values) {
-        for (const value of values) {
-            this.availableValues.delete(value);
+    segment(segmentType) {
+        switch (segmentType) {
+            case 'row':
+                return this.row;
+            case 'column':
+                return this.column;
+            case 'region':
+                return this.region;
+            default:
+                throw new Error(`Unknown segment type '${segmentType}'`);
         }
     }
 }
