@@ -22,14 +22,14 @@ export default class SegmentState {
 
     get values() {
         return this.cells
-            .map((cell) => cell.value)
-            .filter((value) => !isNaN(value));
+            .map(cell => cell.value)
+            .filter(value => !!value);
     }
 
     get cellsByAvailableValue() {
         return this._cellsByAvailableValue = this._cellsByAvailableValue
             || this.cells.reduce((acc, cell) => {
-                if (isNaN(cell.value)) {
+                if (!cell.value) {
                     for (const value of cell.availableValues) {
                         if (!acc.has(value)) {
                             acc.set(value, []);

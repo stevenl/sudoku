@@ -20,7 +20,7 @@ function DebugCell({index}) {
     const grid = useContext(GridContext);
     const cell = grid.cells[index];
 
-    if (!isNaN(cell.value)) {
+    if (cell.value) {
         if (cell.readOnly) {
             return <td className={'readonly'}>{cell.value}</td>;
         } else {

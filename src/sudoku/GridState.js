@@ -22,7 +22,7 @@ export default class GridState {
         const cells = grid._parseGridString(gridString);
         // Add each cell incrementally so the availableValues can be kept up-to-date
         for (const cell of cells) {
-            if (!isNaN(cell.value)) {
+            if (cell.value) {
                 grid = gridReducer(grid, new SetValueAction(cell.index, cell.value, cells, true));
             }
         }
@@ -46,7 +46,7 @@ export default class GridState {
             } else {
                 val = parseInt(val);
             }
-            return new CellState(idx, val, !isNaN(val));
+            return new CellState(idx, val, !!val);
         });
     }
 }

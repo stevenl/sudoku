@@ -42,7 +42,7 @@ function cellsReducer(cells, action) {
         const segment = SegmentState.newFrom(cells, segmentIndex, segmentType);
 
         for (const segmentCell of segment.cells) {
-            if (isNaN(segmentCell.value) && segmentCell.index !== action.index) {
+            if (!segmentCell.value && segmentCell.index !== action.index) {
                 newCells[segmentCell.index] = cellReducer(segmentCell, action);
             }
         }
@@ -55,13 +55,13 @@ function cellReducer(cell, action) {
     assert(!cell.readOnly, `Should not reduce a readOnly cell '${cell}'`);
 
     if (cell.index === action.index) {
-        if (isNaN(action.value)) {
+        if (!action.value) {
             return clearCell(cell, action);
         } else {
             return setCell(cell, action);
         }
     } else {
-        assert(isNaN(cell.value), `Should not refresh cell with value '${cell.value}'`);
+        assert(!cell.value, `Should not refresh cell with value '${cell.value}'`);
         return refreshCell(cell, action);
     }
 }
@@ -98,7 +98,7 @@ function recalculateAvailableValues(cell, action) {
 
         for (const segmentCell of segment.cells) {
             // The old value of the cell should not be removed from availableValues
-            if (!isNaN(segmentCell.value) && segmentCell.index !== action.index) {
+            if (segmentCell.value && segmentCell.index !== action.index) {
                 availableValues.delete(segmentCell.value);
             }
         }
