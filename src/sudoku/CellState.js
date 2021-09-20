@@ -58,4 +58,8 @@ export default class CellState {
                 throw new Error(`Unknown segment type '${segmentType}'`);
         }
     }
+
+    nrAvailableValues() {
+        return this.availableValues.size;
+    }
 }
