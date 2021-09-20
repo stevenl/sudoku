@@ -41,9 +41,7 @@ function HeaderRow() {
         <thead>
         <tr>
             <th>{/* empty row/column header */}</th>
-            {GRID_INDEXES.map((i) =>
-                <th scope="col" key={i}>{i}</th>,
-            )}
+            {GRID_INDEXES.map(i => <th scope="col" key={i}>{i}</th>)}
         </tr>
         </thead>
     );
@@ -55,10 +53,7 @@ function Row({row, cells}) {
     return (
         <tr>
             <th scope="row">{rowLabel}</th>
-            {GRID_INDEXES.map((col) => {
-                const cellIdx = rowStartIdx + col;
-                return cells[cellIdx];
-            })}
+            {GRID_INDEXES.map(col => cells[rowStartIdx + col])}
         </tr>
     );
 }

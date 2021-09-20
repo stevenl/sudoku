@@ -14,7 +14,7 @@ export default class CellState {
             assert(!availableValues, `readOnly cell should not have availableValues '${availableValues}'`);
         } else {
             this.errors = errors !== undefined ? errors : {row: 0, column: 0, region: 0, total: 0};
-            if (isNaN(this.value)) {
+            if (!this.value) {
                 this.availableValues = availableValues || new Set(AVAILABLE_VALUES);
             } else {
                 this.availableValues = new Set();
