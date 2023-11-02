@@ -1,0 +1,7 @@
+# group dependencies so that dependabot opens a single PR for all of the
+# dependencies in the group
+groups:
+  production-dependencies:
+    dependency-type: "production"
+  development-dependencies:
+    dependency-type: "development"
